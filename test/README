@@ -1,0 +1,53 @@
+
+                  success                                  fail
+    ====================================   ====================================
+    
+00  init mutex                             destroy mutex
+    destroy mutex                          ** invalid mutex **
+
+01  init condition                         destroy condition
+    destroy condition                      ** invalid condition **
+
+02  init mutex                             init mutex
+    lock mutex                             lock mutex
+    unlock mutex                           lock mutex
+    destroy mutex                          ** mutex is already locked **
+
+03  init mutexes                           init mutexes
+    lock mutexes 0...n                     lock mutexes 0...n
+    unlock mutexes 0...n                   unlock mutexes 0...n
+    lock mutexes 0...n                     lock mutexes n...0
+    unlock mutexes 0...n                   ** lock order mismatch **
+    destroy mutexes
+
+04  init mutexes                           init mutexes
+    init condition                         init condition
+    lock mutex 0                           lock mutex 0
+    timed wait on condition, mutex 0       timed wait on condition, mutex 1
+    unlock mutex 0                         ** mutex not locked **
+    destroy condition
+    destroy mutexes
+
+05  init mutexes                           init mutexes
+    init condition                         init condition
+    lock mutex 0                           lock mutex 0
+    lock mutex 1                           lock mutex 1
+    unlock mutex 1                         timed wait on condition, mutex 0
+    timed wait on condition, mutex 0       ** lock order will be violated **
+    unlock mutex 0
+    destroy condition
+    destroy mutexes
+
+06  create thread                          join thread
+    join thread                            ** invalid thread **
+
+07  init mutex                             lock mutex
+    lock mutex                             ** invalid mutex **
+    unlock mutex                           
+    destroy mutex                          
+
+08  init mutex                             unlock mutex
+    lock mutex                             ** invalid mutex **
+    unlock mutex                           
+    destroy mutex                          
+    
