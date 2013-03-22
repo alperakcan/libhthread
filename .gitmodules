@@ -1,3 +1,3 @@
-[submodule "makefile.lib"]
-	path = makefile.lib
+[submodule "libmakefile"]
+	path = libmakefile
 	url = git@github.com:anhanguera/libmakefile.git
