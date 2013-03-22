@@ -13,6 +13,7 @@ int main (int argc, char *argv[])
 	pthread_cond_t c;
 	(void) argc;
 	(void) argv;
+	c = *((pthread_cond_t *) &argv);
 	rc = pthread_cond_destroy(&c);
 	if (rc != 0) {
 		fprintf(stderr, "pthread_cond_destroy failed\n");

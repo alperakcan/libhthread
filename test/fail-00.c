@@ -13,6 +13,7 @@ int main (int argc, char *argv[])
 	pthread_mutex_t m;
 	(void) argc;
 	(void) argv;
+	m = *((pthread_mutex_t *) &argv);
 	rc = pthread_mutex_destroy(&m);
 	if (rc != 0) {
 		fprintf(stderr, "pthread_mutex_destroy failed\n");
