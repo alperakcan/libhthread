@@ -91,7 +91,9 @@ static inline int debug_cond_check (struct hthread_cond *mutex, const char *comm
 #endif
 
 struct hthread_arg {
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	char *name;
+#endif
 	int flag;
 	void *arg;
 	void * (*r) (void *);
@@ -114,7 +116,9 @@ struct hthread {
 	int line;
 #endif
         pthread_t thread;
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
         char name[0];
+#endif
 };
 
 struct hthread_cond {
@@ -126,7 +130,9 @@ struct hthread_cond {
 	int line;
 #endif
         pthread_cond_t cond;
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
         char name[0];
+#endif
 };
 
 struct hthread_mutex {
@@ -138,19 +144,29 @@ struct hthread_mutex {
 	int line;
 #endif
 	pthread_mutex_t mutex;
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	char name[0];
+#endif
 };
 
 struct hthread_cond * HTHREAD_FUNCTION_NAME(cond_init_actual) (const char *name, const char *func, const char *file, const int line)
 {
+	unsigned int s;
 	struct hthread_cond *c;
-	c = (struct hthread_cond *) malloc(sizeof(struct hthread_cond) + strlen(name) + 1);
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
+	s = sizeof(struct hthread_cond) + strlen(name) + 1;
+#else
+	s = sizeof(struct hthread_cond);
+#endif
+	c = (struct hthread_cond *) malloc(s);
 	if (c == NULL) {
 		hassertf("malloc failed");
 		return NULL;
 	}
-	memset(c, 0, sizeof(struct hthread_cond) + strlen(name) + 1);
+	memset(c, 0, s);
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	memcpy(c->name, name, strlen(name) + 1);
+#endif
         if (pthread_cond_init(&c->cond, NULL) != 0) {
         	hassertf("can not create cond '%s'", name);
         	free(c);
@@ -270,14 +286,22 @@ again:  ret = pthread_cond_timedwait(&cond->cond, &mutex->mutex, &tspec);
 
 struct hthread_mutex * HTHREAD_FUNCTION_NAME(mutex_init_actual) (const char *name, const char *func, const char *file, const int line)
 {
+	unsigned int s;
 	struct hthread_mutex *m;
-	m = (struct hthread_mutex *) malloc(sizeof(struct hthread_mutex) + strlen(name) + 1);
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
+	s = sizeof(struct hthread_mutex) + strlen(name) + 1;
+#else
+	s = sizeof(struct hthread_mutex);
+#endif
+	m = (struct hthread_mutex *) malloc(s);
 	if (m == NULL) {
 		hassertf("malloc failed");
 		return NULL;
 	}
-	memset(m, 0, sizeof(struct hthread_mutex) + strlen(name) + 1);
+	memset(m, 0, s);
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	memcpy(m->name, name, strlen(name) + 1);
+#endif
 	if (pthread_mutex_init(&m->mutex, NULL) != 0) {
 		hassertf("can not create mutex '%s'", name);
 		free(m);
@@ -348,15 +372,23 @@ static void * thread_run (void *farg)
 struct hthread * HTHREAD_FUNCTION_NAME(create_actual) (const char *name, void * (*function) (void *), void *farg, const char *func, const char *file, const int line)
 {
         int ret;
+        unsigned int s;
         struct hthread *tid;
         struct hthread_arg *arg;
-        tid = (struct hthread *) malloc(sizeof(struct hthread) + strlen(name) + 1);
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
+	s = sizeof(struct hthread) + strlen(name) + 1;
+#else
+	s = sizeof(struct hthread);
+#endif
+        tid = (struct hthread *) malloc(s);
         if (tid == NULL) {
         	hassertf("malloc failed");
         	return NULL;
         }
-        memset(tid, 0, sizeof(struct hthread) + strlen(name) + 1);
+        memset(tid, 0, s);
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
         memcpy(tid->name, name, strlen(name) + 1);
+#endif
         arg = (struct hthread_arg *) malloc(sizeof(struct hthread_arg));
         if (arg == NULL) {
         	hassertf("malloc failed");
@@ -369,7 +401,9 @@ struct hthread * HTHREAD_FUNCTION_NAME(create_actual) (const char *name, void * 
         arg->func = func;
         arg->file = file;
         arg->line = line;
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
         arg->name = tid->name;
+#endif
         arg->cond = hthread_cond_init("arg->cond");
         arg->mutex = hthread_mutex_init("arg->mutex");
         arg->flag = 0;
