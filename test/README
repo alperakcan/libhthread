@@ -77,3 +77,13 @@
 
 41  create thread                          detach thread
     detach thread                          ** invalid thread **
+
+42  main  : init mutex                     main  : init mutex
+    main  : lock mutex                     main  : lock mutex
+    main  : create thread                  main  : create thread
+    thread: lock mutex                     thread: unlock mutex
+    thread: unlock mutex                   ** unlocking mutex currently held **
+    main  : unlock mutex                   ** by other thread **
+    main  : join thread
+    main  : destroy mutex
+  

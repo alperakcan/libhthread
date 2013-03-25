@@ -62,10 +62,12 @@ static pthread_mutex_t debugf_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 
+static inline int debug_thread_check (struct hthread *thread, const char *command, const char *func, const char *file, const int line);
 static inline int debug_thread_add (struct hthread *thread, const char *func, const char *file, const int line);
 static inline int debug_thread_del (struct hthread *thread, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_add_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
-static inline int debug_mutex_find_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line);
+static inline int debug_mutex_dump_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line);
+static inline struct hthread_mutex_lock * debug_mutex_find_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line);
 static inline int debug_mutex_del_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_add (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_del (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
@@ -78,6 +80,7 @@ static inline int debug_cond_check (struct hthread_cond *mutex, const char *comm
 	(void) func; \
 	(void) file; \
 	(void) line;
+#define debug_thread_check(a...)
 #define debug_thread_add(a...)
 #define debug_thread_del(a...)          debug_thread_unused()
 #define debug_mutex_add_lock(a...)	debug_thread_unused()
@@ -337,7 +340,7 @@ int HTHREAD_FUNCTION_NAME(mutex_lock_actual) (struct hthread_mutex *mutex, const
 		t += 1;
 		if (t >= (1000000 / 20000) * 10) {
 			herrorf("still waiting for %s mutex @ (%s %s:%d)", mutex->name, func, file, line);
-			debug_mutex_find_lock(mutex, func, file, line);
+			debug_mutex_dump_lock(mutex, func, file, line);
 			t = 0;
 		}
 	}
@@ -435,8 +438,9 @@ int HTHREAD_FUNCTION_NAME(join_actual) (struct hthread *thread, const char *func
 	if (thread == NULL) {
 		return 0;
 	}
-	debug_thread_del(thread, "join", func, file, line);
+	debug_thread_check(thread, "join", func, file, line);
 	pthread_join(thread->thread, NULL);
+	debug_thread_del(thread, "join", func, file, line);
 	free(thread);
         return 0;
 }
@@ -446,8 +450,9 @@ int HTHREAD_FUNCTION_NAME(detach_actual) (struct hthread *thread, const char *fu
 	if (thread == NULL) {
 		return 0;
 	}
-	debug_thread_del(thread, "detach", func, file, line);
+	debug_thread_check(thread, "join", func, file, line);
 	pthread_detach(thread->thread);
+	debug_thread_del(thread, "detach", func, file, line);
 	free(thread);
         return 0;
 }
@@ -567,6 +572,33 @@ static inline struct hthread * debug_thread_add_root (const char *command)
 	th->thread = debug_thread_self();
 	debug_thread_add_actual(th, NULL, NULL, 0);
 	return th;
+}
+
+static inline int debug_thread_check (struct hthread *thread, const char *command, const char *func, const char *file, const int line)
+{
+	struct hthread *th;
+	struct hthread *sth;
+	debug_thread_lock();
+	LIST_FOREACH(sth, &debug_threads, list) {
+		if (sth->thread == debug_thread_self()) {
+			goto found_sth;
+		}
+	}
+	sth = debug_thread_add_root(command);
+found_sth:
+	LIST_FOREACH(th, &debug_threads, list) {
+		if (th == thread) {
+			goto found_th;
+		}
+	}
+	hinfof("thread: %s (%p): %s with invalid argument '%p'", sth->name, sth, command, thread);
+	hinfof("    at: %s %s:%d", func, file, line);
+	hassert((th == thread) && "invalid thread");
+	debug_thread_unlock();
+	return -1;
+found_th:
+	debug_thread_unlock();
+	return 0;
 }
 
 static inline int debug_thread_add (struct hthread *thread, const char *func, const char *file, const int line)
@@ -753,7 +785,7 @@ found_mt:
 	return 0;
 }
 
-static inline int debug_mutex_find_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line)
+static inline int debug_mutex_dump_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
 	struct hthread_mutex *mt;
@@ -775,6 +807,30 @@ found_mt:
 		}
 	}
 	return 0;
+}
+
+static inline struct hthread_mutex_lock * debug_mutex_find_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line)
+{
+	struct hthread *th;
+	struct hthread_mutex *mt;
+	struct hthread_mutex_lock *mtl;
+	(void) func;
+	(void) file;
+	(void) line;
+	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
+	if (mt != NULL) {
+		goto found_mt;
+	}
+	hassertf("can not find mutex: %s in list", mutex->name);
+	return NULL;
+found_mt:
+	LIST_FOREACH(th, &debug_threads, list) {
+		HASH_FIND_PTR(th->locks, mutex, mtl);
+		if (mtl != NULL) {
+			return mtl;
+		}
+	}
+	return NULL;
 }
 
 static inline int debug_mutex_del_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line)
@@ -804,9 +860,21 @@ found_mt:
 	if (mtl != NULL) {
 		goto found_lc;
 	}
+	mtl = debug_mutex_find_lock(mutex, func, file, line);
+	if (mtl != NULL) {
+		hinfof("thread: %s (%p): %s with mutex '%s (%p)' currently hold by other thread '%s (%p)'", th->name, th, command, mutex->name, mutex, mtl->thread->name, mtl->thread);
+		hinfof("    by: %s (%p)", th->name, th);
+		hinfof("    at: %s %s:%d", func, file, line);
+		hinfof("  lock observed");
+		hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
+		hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
+		hassert((mtl == NULL) && "mutex is locked by other thread");
+		debug_thread_unlock();
+		return -1;
+	}
 	hinfof("thread: %s (%p): %s with un-held mutex '%s (%p)'", th->name, th, command, mutex->name, mutex);
-	hinfof("  by: %s (%p)", th->name, th);
-	hinfof("  at: %s %s:%d", func, file, line);
+	hinfof("    by: %s (%p)", th->name, th);
+	hinfof("    at: %s %s:%d", func, file, line);
 	hassert((mtl != NULL) && "mutex is not locked");
 	debug_thread_unlock();
 	return -1;
