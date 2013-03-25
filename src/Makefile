@@ -1,5 +1,5 @@
 
-target_o-y = \
+target.o-y = \
 	libhthread.o \
 	libhthread-actual.o \
 	libhthread-debug.o
