@@ -115,6 +115,7 @@ struct hthread_arg {
 };
 
 struct hthread {
+        pthread_t thread;
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	UT_hash_handle hh;
 	struct hthread_mutex_lock *locks;
@@ -122,9 +123,6 @@ struct hthread {
 	const char *func;
 	const char *file;
 	int line;
-#endif
-        pthread_t thread;
-#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
         char name[0];
 #endif
 };
@@ -649,7 +647,6 @@ static inline int debug_thread_check (struct hthread *thread, const char *comman
 found_sth:
 	th = debug_thread_find(&thread->thread, command);
 	if (th != NULL) {
-		herrorf("finding self");
 		goto found_th;
 	}
 	hinfof("thread: %s (%p): %s with invalid argument '%p'", sth->name, sth, command, thread);
