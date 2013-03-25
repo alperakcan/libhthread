@@ -194,7 +194,7 @@ struct hthread_mutex;
 #define hthread_cond_broadcast(a)             HTHREAD_FUNCTION_NAME(cond_broadcast_actual)(a, __FUNCTION__, __FILE__, __LINE__)
 #define hthread_cond_destroy(a)               HTHREAD_FUNCTION_NAME(cond_destroy_actual)(a, __FUNCTION__, __FILE__, __LINE__)
 
-unsigned int HTHREAD_FUNCTION_NAME(self_actual) (const char *func, const char *file, const int line);
+struct hthread * HTHREAD_FUNCTION_NAME(self_actual) (const char *func, const char *file, const int line);
 int HTHREAD_FUNCTION_NAME(sched_yield_actual) (const char *func, const char *file, const int line);
 
 struct hthread * HTHREAD_FUNCTION_NAME(create_actual) (const char *name, void * (*function) (void *), void *arg, const char *func, const char *file, const int line);
