@@ -172,9 +172,9 @@ static inline int hthread_add_actual (struct hthread *thread, const char *func, 
 	HASH_FIND(hh, hthreads, &thread->thread, sizeof(thread->thread), th);
 	if (th != NULL) {
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
-		hassertf("thread: %s is already in list", thread->name);
+		hassertf("thread: %s (%p) is already in list", thread->name, thread);
 #else
-		hassertf("thread: 0x%08llx is already in list", (unsigned long long) thread->thread);
+		hassertf("thread: 0x%08llx (%p) is already in list", (unsigned long long) thread->thread, thread);
 #endif
 		hthread_unlock();
 		return -1;
