@@ -27,6 +27,11 @@
     unlock mutexes 0...n                   ** lock order mismatch **
     destroy mutexes
 
+05  init mutex                             init mutex
+    lock mutex                             unlock mutex
+    unlock mutex                           **unlocking a unheld mutex **
+    destroy mutex
+
 20  init condition                         destroy condition
     destroy condition                      ** invalid condition **
 
