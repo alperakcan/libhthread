@@ -601,7 +601,7 @@ found_th:
 	}
 	hinfof("thread: %s (%p): %s with invalid mutex '%p'", th->name, th, command, mutex);
 	hinfof("    at: %s %s:%d", func, file, line);
-	hassert(0 && "invalid mutex");
+	hassert((mt != NULL) && "invalid mutex");
 	debug_thread_unlock();
 	return -1;
 found_mt:
@@ -612,7 +612,7 @@ found_mt:
 		hinfof("  previously acquired");
 		hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
 		hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
-		hassert(0 && "mutex is already locked");
+		hassert((mt == NULL) && "mutex is already locked");
 		debug_thread_unlock();
 		return -1;
 	}
@@ -678,7 +678,7 @@ found_mt:
 			hinfof("    followed by a later acquisition of %s (%p)", mto->key.second->name, mto->key.second);
 			hinfof("      by: %s (%p)", mto->info.second.thread->name, mto->info.second.thread);
 			hinfof("      at: %s %s:%d", mto->info.second.func, mto->info.second.file, mto->info.second.line);
-			hassert(0 && "lock order violation");
+			hassert((mto == NULL) && "lock order violation");
 			continue;
 		}
 		nmto = malloc(sizeof(struct hthread_mutex_order));
@@ -762,7 +762,7 @@ found_th:
 	}
 	hinfof("thread: %s (%p): %s with invalid mutex '%p'", th->name, th, command, mutex);
 	hinfof("    at: %s %s:%d", func, file, line);
-	hassert(0 && "invalid mutex");
+	hassert((mt != NULL) && "invalid mutex");
 	debug_thread_unlock();
 	return -1;
 found_mt:
@@ -773,7 +773,7 @@ found_mt:
 	hinfof("thread: %s (%p): %s with un-held mutex '%s (%p)'", th->name, th, command, mutex->name, mutex);
 	hinfof("  by: %s (%p)", th->name, th);
 	hinfof("  at: %s %s:%d", func, file, line);
-	hassert(0 && "mutex is not locked");
+	hassert((mtl != NULL) && "mutex is not locked");
 	debug_thread_unlock();
 	return -1;
 found_lc:
@@ -836,7 +836,7 @@ found_th:
 	}
 	hinfof("thread: %s (%p): %s with invalid mutex '%p'", th->name, th, command, mutex);
 	hinfof("    at: %s %s:%d", func, file, line);
-	hassert(0 && "invalid mutex");
+	hassert((mt != NULL) && "invalid mutex");
 	debug_thread_unlock();
 	return -1;
 found_mt:
