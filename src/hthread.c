@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <assert.h>
-#include <sys/queue.h>
 
 #define HTHREAD_INTERNAL	1
 #define HTHREAD_DISABLE_YIELD	0
@@ -111,7 +110,7 @@ struct hthread_arg {
 
 struct hthread {
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
-	LIST_ENTRY(hthread) list;
+	UT_hash_handle hh;
 	struct hthread_mutex_lock *locks;
 	struct hthread_cond *conds;
 	const char *func;
@@ -517,7 +516,7 @@ static pthread_mutex_t debug_mutex = PTHREAD_MUTEX_INITIALIZER;
 #define debug_thread_unlock() pthread_mutex_unlock(&debug_mutex)
 #define debug_thread_self()   pthread_self()
 
-static LIST_HEAD(debug_threads, hthread) debug_threads = LIST_HEAD_INITIALIZER(debug_threads);
+static struct hthread *debug_threads = NULL;
 static struct hthread_cond *debug_conds = NULL;
 static struct hthread_mutex *debug_mutexes = NULL;
 static struct hthread_mutex_order *debug_orders = NULL;
@@ -525,19 +524,28 @@ static struct hthread_mutex_order *debug_orders = NULL;
 static inline int debug_thread_add_actual (struct hthread *thread, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
-	LIST_FOREACH(th, &debug_threads, list) {
+#if 0
+	struct hthread *nth;
+	HASH_ITER(hh, debug_threads, th, nth) {
 		if (th == thread) {
 			hassertf("thread: %s is already in list", thread->name);
 			debug_thread_unlock();
 			return -1;
 		}
 	}
+#endif
+	HASH_FIND(hh, debug_threads, &thread->thread, sizeof(thread->thread), th);
+	if (th != NULL) {
+		hassertf("thread: %s is already in list", thread->name);
+		debug_thread_unlock();
+		return -1;
+	}
 	thread->func = func;
 	thread->file = file;
 	thread->line = line;
 	thread->conds = NULL;
 	thread->locks = NULL;
-	LIST_INSERT_HEAD(&debug_threads, thread, list);
+	HASH_ADD(hh, debug_threads, thread, sizeof(thread->thread), thread);
 	hinfof("thread: %s (%p) created", thread->name, thread);
 	hinfof("    at: %s %s:%d", func, file, line);
 	return 0;
@@ -546,7 +554,8 @@ static inline int debug_thread_add_actual (struct hthread *thread, const char *f
 static inline struct hthread * debug_thread_add_root (const char *command)
 {
 	struct hthread *th;
-	LIST_FOREACH(th, &debug_threads, list) {
+	struct hthread *nth;
+	HASH_ITER(hh, debug_threads, th, nth) {
 		if (strcmp(th->name, "root-process") != 0) {
 			continue;
 		}
@@ -574,22 +583,68 @@ static inline struct hthread * debug_thread_add_root (const char *command)
 	return th;
 }
 
+static struct hthread * debug_thread_find_self (const char *command)
+{
+	struct hthread *th;
+#if 0
+	struct hthread *nth;
+	HASH_ITER(hh, debug_threads, th, nth) {
+		if (th->thread == debug_thread_self()) {
+			goto found_th;
+		}
+	}
+#else
+	pthread_t self;
+	self = debug_thread_self();
+	HASH_FIND(hh, debug_threads, &self, sizeof(self), th);
+	if (th != NULL) {
+		goto found_th;
+	}
+#endif
+	th = debug_thread_add_root(command);
+found_th:
+	return th;
+}
+
+static struct hthread * debug_thread_find (pthread_t *thread, const char *command)
+{
+	struct hthread *th;
+	(void) command;
+#if 0
+	struct hthread *nth;
+	HASH_ITER(hh, debug_threads, th, nth) {
+		if (th->thread == *thread) {
+			goto found_th;
+		}
+	}
+#else
+	HASH_FIND(hh, debug_threads, thread, sizeof(*thread), th);
+	if (th != NULL) {
+		goto found_th;
+	}
+#endif
+	return NULL;
+found_th:
+	return th;
+}
+
 static inline int debug_thread_check (struct hthread *thread, const char *command, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
 	struct hthread *sth;
 	debug_thread_lock();
-	LIST_FOREACH(sth, &debug_threads, list) {
-		if (sth->thread == debug_thread_self()) {
-			goto found_sth;
-		}
+	sth = debug_thread_find_self(command);
+	if (sth != NULL) {
+		goto found_sth;
 	}
-	sth = debug_thread_add_root(command);
+	hassert((sth != NULL) && "can not find self");
+	debug_thread_unlock();
+	return -1;
 found_sth:
-	LIST_FOREACH(th, &debug_threads, list) {
-		if (th == thread) {
-			goto found_th;
-		}
+	th = debug_thread_find(&thread->thread, command);
+	if (th != NULL) {
+		herrorf("finding self");
+		goto found_th;
 	}
 	hinfof("thread: %s (%p): %s with invalid argument '%p'", sth->name, sth, command, thread);
 	hinfof("    at: %s %s:%d", func, file, line);
@@ -612,16 +667,18 @@ static inline int debug_thread_add (struct hthread *thread, const char *func, co
 static inline int debug_thread_del (struct hthread *thread, const char *command, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
+	struct hthread *nth;
 	struct hthread *sth;
+	struct hthread *nsth;
 	debug_thread_lock();
-	LIST_FOREACH(sth, &debug_threads, list) {
+	HASH_ITER(hh, debug_threads, sth, nsth) {
 		if (sth->thread == debug_thread_self()) {
 			goto found_sth;
 		}
 	}
 	sth = debug_thread_add_root(command);
 found_sth:
-	LIST_FOREACH(th, &debug_threads, list) {
+	HASH_ITER(hh, debug_threads, th, nth) {
 		if (th == thread) {
 			goto found_th;
 		}
@@ -636,7 +693,7 @@ found_th:
 	hinfof("  created at: %s %s:%d", thread->func, thread->file, thread->line);
 	hinfof("  deleted by: %s (%p)", sth->name, sth);
 	hinfof("          at: %s %s:%d", func, file, line);
-	LIST_REMOVE(th, list);
+	HASH_DEL(debug_threads, th);
 	debug_thread_unlock();
 	return 0;
 }
@@ -654,12 +711,13 @@ static inline int debug_mutex_add_lock (struct hthread_mutex *mutex, const char 
 	struct hthread_mutex_order *ndmto;
 	struct hthread_mutex_order_key key;
 	debug_thread_lock();
-	LIST_FOREACH(th, &debug_threads, list) {
-		if (th->thread == debug_thread_self()) {
-			goto found_th;
-		}
+	th = debug_thread_find_self(command);
+	if (th != NULL) {
+		goto found_th;
 	}
-	th = debug_thread_add_root(command);
+	hassert((th != NULL) && "can not find self");
+	debug_thread_unlock();
+	return -1;
 found_th:
 	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
 	if (mt != NULL) {
@@ -788,6 +846,7 @@ found_mt:
 static inline int debug_mutex_dump_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
+	struct hthread *nth;
 	struct hthread_mutex *mt;
 	struct hthread_mutex_lock *mtl;
 	(void) func;
@@ -800,7 +859,7 @@ static inline int debug_mutex_dump_lock (struct hthread_mutex *mutex, const char
 	hassertf("can not find mutex: %s in list", mutex->name);
 	return -1;
 found_mt:
-	LIST_FOREACH(th, &debug_threads, list) {
+	HASH_ITER(hh, debug_threads, th, nth) {
 		HASH_FIND_PTR(th->locks, mutex, mtl);
 		if (mtl != NULL) {
 			herrorf("mutex: %s is already locked @ (%s %s:%d)", mutex->name, mtl->func, mtl->file, mtl->line);
@@ -812,6 +871,7 @@ found_mt:
 static inline struct hthread_mutex_lock * debug_mutex_find_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
+	struct hthread *nth;
 	struct hthread_mutex *mt;
 	struct hthread_mutex_lock *mtl;
 	(void) func;
@@ -824,7 +884,7 @@ static inline struct hthread_mutex_lock * debug_mutex_find_lock (struct hthread_
 	hassertf("can not find mutex: %s in list", mutex->name);
 	return NULL;
 found_mt:
-	LIST_FOREACH(th, &debug_threads, list) {
+	HASH_ITER(hh, debug_threads, th, nth) {
 		HASH_FIND_PTR(th->locks, mutex, mtl);
 		if (mtl != NULL) {
 			return mtl;
@@ -839,12 +899,13 @@ static inline int debug_mutex_del_lock (struct hthread_mutex *mutex, const char 
 	struct hthread_mutex *mt;
 	struct hthread_mutex_lock *mtl;
 	debug_thread_lock();
-	LIST_FOREACH(th, &debug_threads, list) {
-		if (th->thread == debug_thread_self()) {
-			goto found_th;
-		}
+	th = debug_thread_find_self(command);
+	if (th != NULL) {
+		goto found_th;
 	}
-	th = debug_thread_add_root(command);
+	hassert((th != NULL) && "can not find self");
+	debug_thread_unlock();
+	return -1;
 found_th:
 	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
 	if (mt != NULL) {
@@ -894,12 +955,13 @@ static inline int debug_mutex_add (struct hthread_mutex *mutex, const char *comm
 	struct hthread *th;
 	struct hthread_mutex *mt;
 	debug_thread_lock();
-	LIST_FOREACH(th, &debug_threads, list) {
-		if (th->thread == debug_thread_self()) {
-			goto found_th;
-		}
+	th = debug_thread_find_self(command);
+	if (th != NULL) {
+		goto found_th;
 	}
-	th = debug_thread_add_root(command);
+	hassert((th != NULL) && "can not find self");
+	debug_thread_unlock();
+	return -1;
 found_th:
 	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
 	if (mt != NULL) {
@@ -925,12 +987,13 @@ static inline int debug_mutex_del (struct hthread_mutex *mutex, const char *comm
 	struct hthread_mutex_order *mto;
 	struct hthread_mutex_order *nmto;
 	debug_thread_lock();
-	LIST_FOREACH(th, &debug_threads, list) {
-		if (th->thread == debug_thread_self()) {
-			goto found_th;
-		}
+	th = debug_thread_find_self(command);
+	if (th != NULL) {
+		goto found_th;
 	}
-	th = debug_thread_add_root(command);
+	hassert((th != NULL) && "can not find self");
+	debug_thread_unlock();
+	return -1;
 found_th:
 	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
 	if (mt != NULL) {
@@ -967,12 +1030,13 @@ static inline int debug_cond_add (struct hthread_cond *cond, const char *command
 	struct hthread *th;
 	struct hthread_cond *cv;
 	debug_thread_lock();
-	LIST_FOREACH(th, &debug_threads, list) {
-		if (th->thread == debug_thread_self()) {
-			goto found_th;
-		}
+	th = debug_thread_find_self(command);
+	if (th != NULL) {
+		goto found_th;
 	}
-	th = debug_thread_add_root(command);
+	hassert((th != NULL) && "can not find self");
+	debug_thread_unlock();
+	return -1;
 found_th:
 	HASH_FIND_PTR(debug_conds, &cond, cv);
 	if (cv != NULL) {
@@ -995,12 +1059,13 @@ static inline int debug_cond_del (struct hthread_cond *cond, const char *command
 	struct hthread *th;
 	struct hthread_cond *cv;
 	debug_thread_lock();
-	LIST_FOREACH(th, &debug_threads, list) {
-		if (th->thread == debug_thread_self()) {
-			goto found_th;
-		}
+	th = debug_thread_find_self(command);
+	if (th != NULL) {
+		goto found_th;
 	}
-	th = debug_thread_add_root(command);
+	hassert((th != NULL) && "can not find self");
+	debug_thread_unlock();
+	return -1;
 found_th:
 	HASH_FIND_PTR(debug_conds, &cond, cv);
 	if (cv != NULL) {
@@ -1023,12 +1088,13 @@ static inline int debug_cond_check (struct hthread_cond *cond, const char *comma
 	struct hthread *th;
 	struct hthread_cond *cv;
 	debug_thread_lock();
-	LIST_FOREACH(th, &debug_threads, list) {
-		if (th->thread == debug_thread_self()) {
-			goto found_th;
-		}
+	th = debug_thread_find_self(command);
+	if (th != NULL) {
+		goto found_th;
 	}
-	th = debug_thread_add_root(command);
+	hassert((th != NULL) && "can not find self");
+	debug_thread_unlock();
+	return -1;
 found_th:
 	HASH_FIND_PTR(debug_conds, &cond, cv);
 	if (cv != NULL) {
