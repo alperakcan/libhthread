@@ -1,3 +1,0 @@
-[submodule "libmakefile"]
-	path = libmakefile
-	url = git@github.com:anhanguera/libmakefile
