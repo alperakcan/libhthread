@@ -10,13 +10,13 @@
 int main (int argc, char *argv[])
 {
 	int rc;
-	pthread_cond_t c;
+	pthread_mutex_t m;
 	(void) argc;
 	(void) argv;
-	c = *((pthread_cond_t *) &argv);
-	rc = pthread_cond_destroy(&c);
+	m = *((pthread_mutex_t *) &argv);
+	rc = pthread_mutex_lock(&m);
 	if (rc != 0) {
-		fprintf(stderr, "pthread_cond_destroy failed\n");
+		fprintf(stderr, "pthread_mutex_lock failed\n");
 		exit(-1);
 	}
 	return 0;
