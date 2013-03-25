@@ -75,5 +75,5 @@
 40  create thread                          join thread
     join thread                            ** invalid thread **
 
-40  create thread                          detach thread
+41  create thread                          detach thread
     detach thread                          ** invalid thread **
