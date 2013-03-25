@@ -486,9 +486,6 @@ static struct hthread_mutex_order *debug_orders = NULL;
 static inline int debug_thread_add_actual (struct hthread *thread, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
-	(void) func;
-	(void) file;
-	(void) line;
 	LIST_FOREACH(th, &debug_threads, list) {
 		if (th == thread) {
 			hassertf("thread: %s is already in list", thread->name);
@@ -540,9 +537,6 @@ static inline struct hthread * debug_thread_add_root (const char *command)
 
 static inline int debug_thread_add (struct hthread *thread, const char *func, const char *file, const int line)
 {
-	(void) func;
-	(void) file;
-	(void) line;
 	debug_thread_lock();
 	debug_thread_add_actual(thread, func, file, line);
 	debug_thread_unlock();
@@ -553,9 +547,6 @@ static inline int debug_thread_del (struct hthread *thread, const char *command,
 {
 	struct hthread *th;
 	struct hthread *sth;
-	(void) func;
-	(void) file;
-	(void) line;
 	debug_thread_lock();
 	LIST_FOREACH(sth, &debug_threads, list) {
 		if (sth->thread == debug_thread_self()) {
@@ -571,7 +562,7 @@ found_sth:
 	}
 	hinfof("thread: %s (%p): %s with invalid argument '%p'", sth->name, sth, command, thread);
 	hinfof("    at: %s %s:%d", func, file, line);
-	hassert(0 && "invalid thread");
+	hassert((th == thread) && "invalid thread");
 	debug_thread_unlock();
 	return -1;
 found_th:
@@ -831,9 +822,6 @@ static inline int debug_mutex_del (struct hthread_mutex *mutex, const char *comm
 	struct hthread_mutex_lock *mtl;
 	struct hthread_mutex_order *mto;
 	struct hthread_mutex_order *nmto;
-	(void) func;
-	(void) file;
-	(void) line;
 	debug_thread_lock();
 	LIST_FOREACH(th, &debug_threads, list) {
 		if (th->thread == debug_thread_self()) {
