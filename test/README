@@ -30,7 +30,23 @@
 20  init condition                         destroy condition
     destroy condition                      ** invalid condition **
 
-21  init mutexes                           init mutexes
+21  init condition                         signal condition
+    signal condition                       ** invalid condition **
+    destroy condition
+
+22  init condition                         broadcast condition
+    broadcast condition                    ** invalid condition **
+    destroy condition
+
+23  init condition                         init mutex
+    init mutex                             lock mutex
+    lock mutex                             timed wait on condition, mutex
+    timed wait on condition, mutex         ** invalid condition **
+    unlock mutex
+    destroy condition
+    destroy mutex                          
+
+28  init mutexes                           init mutexes
     init condition                         init condition
     lock mutex 0                           lock mutex 0
     lock mutex 1                           lock mutex 1
@@ -40,7 +56,7 @@
     destroy condition
     destroy mutexes
 
-22  init mutexes                           init mutexes
+29  init mutexes                           init mutexes
     init condition                         init condition
     lock mutex 0                           lock mutex 0
     timed wait on condition, mutex 0       timed wait on condition, mutex 1

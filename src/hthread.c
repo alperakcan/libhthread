@@ -48,7 +48,7 @@ static pthread_mutex_t debugf_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
 #define hassert(a) { \
-	assert(0 && a); \
+	assert(a); \
 }
 
 #define hassertf(a...) { \
@@ -66,13 +66,12 @@ static inline int debug_thread_add (struct hthread *thread, const char *func, co
 static inline int debug_thread_del (struct hthread *thread, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_add_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_find_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line);
-static inline int debug_mutex_check_order (struct hthread_mutex *mutex, int order, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_del_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_add (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_del (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
 static inline int debug_cond_add (struct hthread_cond *mutex, const char *command, const char *func, const char *file, const int line);
 static inline int debug_cond_del (struct hthread_cond *mutex, const char *command, const char *func, const char *file, const int line);
-
+static inline int debug_cond_check (struct hthread_cond *mutex, const char *command, const char *func, const char *file, const int line);
 #else
 
 #define debug_thread_unused() \
@@ -83,11 +82,11 @@ static inline int debug_cond_del (struct hthread_cond *mutex, const char *comman
 #define debug_thread_del(a...)          debug_thread_unused()
 #define debug_mutex_add_lock(a...)	debug_thread_unused()
 #define debug_mutex_del_lock(a...)	debug_thread_unused()
-#define debug_mutex_check_order(a...)	debug_thread_unused()
 #define debug_mutex_add(a...)		debug_thread_unused()
 #define debug_mutex_del(a...)           debug_thread_unused()
 #define debug_cond_add(a...)		debug_thread_unused()
 #define debug_cond_del(a...)            debug_thread_unused()
+#define debug_cond_check(a...)          debug_thread_unused()
 
 #endif
 
@@ -109,7 +108,6 @@ struct hthread {
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	LIST_ENTRY(hthread) list;
 	struct hthread_mutex_lock *locks;
-	LIST_HEAD(locks_list, hthread_mutex_lock) locks_list;
 	struct hthread_cond *conds;
 	const char *func;
 	const char *file;
@@ -175,24 +173,19 @@ int HTHREAD_FUNCTION_NAME(cond_destroy_actual) (struct hthread_cond *cond, const
 
 int HTHREAD_FUNCTION_NAME(cond_signal_actual) (struct hthread_cond *cond, const char *func, const char *file, const int line)
 {
-	(void) func;
-	(void) file;
-	(void) line;
+	debug_cond_check(cond, "cond signal", func, file, line);
         return pthread_cond_signal(&cond->cond);
 }
 
 int HTHREAD_FUNCTION_NAME(cond_broadcast_actual) (struct hthread_cond *cond, const char *func, const char *file, const int line)
 {
-	(void) func;
-	(void) file;
-	(void) line;
+	debug_cond_check(cond, "cond signal", func, file, line);
 	return pthread_cond_broadcast(&cond->cond);
 }
 
 int HTHREAD_FUNCTION_NAME(cond_wait_actual) (struct hthread_cond *cond, struct hthread_mutex *mutex, const char *func, const char *file, const int line)
 {
 	int r;
-	//debug_mutex_check_order(mutex, -1, "cond wait", func, file, line);
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	unsigned int t = 0;
 	while (1) {
@@ -217,7 +210,7 @@ int HTHREAD_FUNCTION_NAME(cond_wait_actual) (struct hthread_cond *cond, struct h
 int HTHREAD_FUNCTION_NAME(cond_timedwait_tspec_actual) (struct hthread_cond *cond, struct hthread_mutex *mutex, struct timespec *tspec, const char *func, const char *file, const int line)
 {
 	int ret;
-	//debug_mutex_check_order(mutex, -1, "cond timedwait", func, file, line);
+	debug_cond_check(cond, "cond timedwait", func, file, line);
 	debug_mutex_del_lock(mutex, "cond timedwait", func, file, line);
 again:  ret = pthread_cond_timedwait(&cond->cond, &mutex->mutex, tspec);
 	switch (ret) {
@@ -243,7 +236,6 @@ int HTHREAD_FUNCTION_NAME(cond_timedwait_actual) (struct hthread_cond *cond, str
 	int ret;
         struct timeval tval;
         struct timespec tspec;
-        //debug_mutex_check_order(mutex, -1, "cond timedwait", func, file, line);
 	if (msec < 0) {
 		return HTHREAD_FUNCTION_NAME(cond_wait_actual)(cond, mutex, func, file, line);
 	}
@@ -452,7 +444,6 @@ struct hthread_mutex_lock {
 	const char *func;
 	const char *file;
 	int line;
-	LIST_ENTRY(hthread_mutex_lock) hl;
 	UT_hash_handle hh;
 };
 
@@ -488,9 +479,6 @@ static pthread_mutex_t debug_mutex = PTHREAD_MUTEX_INITIALIZER;
 static LIST_HEAD(debug_threads, hthread) debug_threads = LIST_HEAD_INITIALIZER(debug_threads);
 static struct hthread_cond *debug_conds = NULL;
 static struct hthread_mutex *debug_mutexes = NULL;
-#if 0
-static struct hthread_mutex_lock *debug_locks = NULL;
-#endif
 static struct hthread_mutex_order *debug_orders = NULL;
 
 static inline int debug_thread_add_actual (struct hthread *thread, const char *func, const char *file, const int line)
@@ -511,7 +499,6 @@ static inline int debug_thread_add_actual (struct hthread *thread, const char *f
 	thread->line = line;
 	thread->conds = NULL;
 	thread->locks = NULL;
-	LIST_INIT(&thread->locks_list);
 	LIST_INSERT_HEAD(&debug_threads, thread, list);
 	hinfof("thread: %s (%p) created", thread->name, thread);
 	hinfof("    at: %s %s:%d", func, file, line);
@@ -535,7 +522,7 @@ static inline struct hthread * debug_thread_add_root (const char *command)
 			continue;
 		}
 		hinfof("%s within unknown thread", command);
-		hassert("invalid thread");
+		hassert(0 && "invalid thread");
 	}
 	th = malloc(sizeof(struct hthread) + strlen("root-process") + 1);
 	if (th == NULL) {
@@ -582,7 +569,7 @@ found_sth:
 	}
 	hinfof("thread: %s (%p): %s with invalid argument '%p'", sth->name, sth, command, thread);
 	hinfof("    at: %s %s:%d", func, file, line);
-	hassert("thread is invalid");
+	hassert(0 && "invalid thread");
 	debug_thread_unlock();
 	return -1;
 found_th:
@@ -621,7 +608,7 @@ found_th:
 	}
 	hinfof("thread: %s (%p): %s with invalid mutex '%p'", th->name, th, command, mutex);
 	hinfof("    at: %s %s:%d", func, file, line);
-	hassert("mutex is unknown");
+	hassert(0 && "invalid mutex");
 	debug_thread_unlock();
 	return -1;
 found_mt:
@@ -632,7 +619,7 @@ found_mt:
 		hinfof("  previously acquired");
 		hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
 		hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
-		hassert("mutex is already locked");
+		hassert(0 && "mutex is already locked");
 		debug_thread_unlock();
 		return -1;
 	}
@@ -698,7 +685,7 @@ found_mt:
 			hinfof("    followed by a later acquisition of %s (%p)", mto->key.second->name, mto->key.second);
 			hinfof("      by: %s (%p)", mto->info.second.thread->name, mto->info.second.thread);
 			hinfof("      at: %s %s:%d", mto->info.second.func, mto->info.second.file, mto->info.second.line);
-			hassert("mutex lock order violation");
+			hassert(0 && "lock order violation");
 			continue;
 		}
 		nmto = malloc(sizeof(struct hthread_mutex_order));
@@ -734,24 +721,7 @@ found_mt:
 	nmtl->file = file;
 	nmtl->line = line;
 	HASH_ADD_PTR(th->locks, mutex, nmtl);
-	LIST_INSERT_HEAD(&th->locks_list, nmtl, hl);
 	hdebugf("added lock mutex: %s @ %p, to thread: %s @ %p", mutex->name, mutex, th->name, th);
-#if 0
-	nmtl = malloc(sizeof(struct hthread_mutex_lock));
-	if (nmtl == NULL) {
-		hassertf("malloc failed");
-		debug_thread_unlock();
-		return -1;
-	}
-	memset(nmtl, 0, sizeof(struct hthread_mutex_lock));
-	nmtl->thread = th;
-	nmtl->mutex = mutex;
-	nmtl->func = func;
-	nmtl->file = file;
-	nmtl->line = line;
-	HASH_ADD_PTR(debug_locks, mutex, nmtl);
-	hdebugf("added lock mutex: %s @ %p, to table: %s @ %p", mutex->name, mutex, th->name, th);
-#endif
 	debug_thread_unlock();
 	return 0;
 }
@@ -780,78 +750,11 @@ found_mt:
 	return 0;
 }
 
-static inline int debug_mutex_check_order (struct hthread_mutex *mutex, int order, const char *command, const char *func, const char *file, const int line)
-{
-	struct hthread *th;
-	struct hthread_mutex *mt;
-	struct hthread_mutex_lock *mtl;
-	struct hthread_mutex_lock *dmtl;
-	struct hthread_mutex_lock *ndmtl;
-	debug_thread_lock();
-	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
-	if (mt != NULL) {
-		goto found_mt;
-	}
-	hassertf("can not find mutex: %s in list", mutex->name);
-	debug_thread_unlock();
-	return -1;
-found_mt:
-	LIST_FOREACH(th, &debug_threads, list) {
-		if (th->thread == debug_thread_self()) {
-			goto found_th;
-		}
-	}
-	hassertf("can not find thread: %u in list", (unsigned int) debug_thread_self());
-	debug_thread_unlock();
-	return -1;
-found_th:
-	HASH_FIND_PTR(th->locks, mutex, mtl);
-	if (mtl != NULL) {
-		goto found_lc;
-	}
-	hinfof("thread: %s (%p): %s with un-held mutex '%s (%p)'", th->name, th, command, mutex->name, mutex);
-	hinfof("  by: %s (%p)", th->name, th);
-	hinfof("  at: %s %s:%d", func, file, line);
-	hassert("mutex is not locked");
-	debug_thread_unlock();
-	return -1;
-found_lc:
-	if (order == -1) {
-		if (mtl == LIST_FIRST(&th->locks_list)) {
-			debug_thread_unlock();
-			return 0;
-		}
-	} else {
-		hassertf("check order: %d is not implemented", order);
-	}
-	hdebugf("locks: %u", HASH_COUNT(th->locks));
-	HASH_ITER(hh, th->locks, dmtl, ndmtl) {
-		herrorf("  %s @ %s, %p @ %s:%s:%d",
-			dmtl->mutex->name,
-			dmtl->thread->name,
-			dmtl->mutex,
-			dmtl->func, dmtl->file, dmtl->line);
-	}
-	hassertf("lock order will be violated by unlocking\n"
-	      "  %s (%p) @ %s, %s:%s:%d, locked @ %s:%s:%d",
-	      mtl->mutex->name,
-	      mtl->mutex,
-	      mtl->thread->name,
-	      func, file, line,
-	      mtl->func, mtl->file, mtl->line);
-	debug_thread_unlock();
-	return 0;
-}
-
 static inline int debug_mutex_del_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
 	struct hthread_mutex *mt;
 	struct hthread_mutex_lock *mtl;
-#if 0
-	struct hthread_mutex_lock *gmtl;
-#endif
-	//debug_mutex_check_order(mutex, -1, func, file, line);
 	debug_thread_lock();
 	LIST_FOREACH(th, &debug_threads, list) {
 		if (th->thread == debug_thread_self()) {
@@ -866,7 +769,7 @@ found_th:
 	}
 	hinfof("thread: %s (%p): %s with invalid mutex '%p'", th->name, th, command, mutex);
 	hinfof("    at: %s %s:%d", func, file, line);
-	hassert("mutex is unknown");
+	hassert(0 && "invalid mutex");
 	debug_thread_unlock();
 	return -1;
 found_mt:
@@ -874,34 +777,19 @@ found_mt:
 	if (mtl != NULL) {
 		goto found_lc;
 	}
-#if 0
-	HASH_FIND_PTR(debug_locks, mutex, gmtl);
-	if (gmtl != NULL) {
-		goto found_lc;
-	}
-#endif
 	hinfof("thread: %s (%p): %s with un-held mutex '%s (%p)'", th->name, th, command, mutex->name, mutex);
 	hinfof("  by: %s (%p)", th->name, th);
 	hinfof("  at: %s %s:%d", func, file, line);
-	hassert("mutex is not locked");
+	hassert(0 && "mutex is not locked");
 	debug_thread_unlock();
 	return -1;
 found_lc:
 	HASH_FIND_PTR(th->locks, mutex, mtl);
 	if (mtl != NULL) {
 		HASH_DEL(th->locks, mtl);
-		LIST_REMOVE(mtl, hl);
 		hdebugf("deleted lock mutex: %s @ %p, from thread: %s @ %p", mutex->name, mutex, th->name, th);
 		free(mtl);
 	}
-#if 0
-	HASH_FIND_PTR(debug_locks, mutex, gmtl);
-	if (gmtl != NULL) {
-		HASH_DEL(debug_locks, gmtl);
-		hdebugf("deleted lock mutex: %s @ %p, from table: %s @ %p", mutex->name, mutex, th->name, th);
-		free(gmtl);
-	}
-#endif
 	debug_thread_unlock();
 	return 0;
 }
@@ -958,7 +846,7 @@ found_th:
 	}
 	hinfof("thread: %s (%p): %s with invalid mutex '%p'", th->name, th, command, mutex);
 	hinfof("    at: %s %s:%d", func, file, line);
-	hassert("could not find requested mutex in list");
+	hassert(0 && "invalid mutex");
 	debug_thread_unlock();
 	return -1;
 found_mt:
@@ -985,7 +873,7 @@ found_mt:
 static inline int debug_cond_add (struct hthread_cond *cond, const char *command, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
-	struct hthread_cond *mt;
+	struct hthread_cond *cv;
 	debug_thread_lock();
 	LIST_FOREACH(th, &debug_threads, list) {
 		if (th->thread == debug_thread_self()) {
@@ -994,8 +882,8 @@ static inline int debug_cond_add (struct hthread_cond *cond, const char *command
 	}
 	th = debug_thread_add_root(command);
 found_th:
-	HASH_FIND_PTR(debug_conds, &cond, mt);
-	if (mt != NULL) {
+	HASH_FIND_PTR(debug_conds, &cond, cv);
+	if (cv != NULL) {
 		hassertf("cond: %s is already in list", cond->name);
 		debug_thread_unlock();
 		return -1;
@@ -1014,9 +902,6 @@ static inline int debug_cond_del (struct hthread_cond *cond, const char *command
 {
 	struct hthread *th;
 	struct hthread_cond *cv;
-	(void) func;
-	(void) file;
-	(void) line;
 	debug_thread_lock();
 	LIST_FOREACH(th, &debug_threads, list) {
 		if (th->thread == debug_thread_self()) {
@@ -1031,12 +916,38 @@ found_th:
 	}
 	hinfof("thread: %s (%p): %s with invalid condition '%p'", th->name, th, command, cond);
 	hinfof("    at: %s %s:%d", func, file, line);
-	hassert("could not find requested condition in list");
+	hassert((cv != NULL) && "invalid condition");
 	debug_thread_unlock();
 	return -1;
 found_cv:
 	hdebugf("deleting cond: %s", cond->name);
 	HASH_DEL(debug_conds, cv);
+	debug_thread_unlock();
+	return 0;
+}
+
+static inline int debug_cond_check (struct hthread_cond *cond, const char *command, const char *func, const char *file, const int line)
+{
+	struct hthread *th;
+	struct hthread_cond *cv;
+	debug_thread_lock();
+	LIST_FOREACH(th, &debug_threads, list) {
+		if (th->thread == debug_thread_self()) {
+			goto found_th;
+		}
+	}
+	th = debug_thread_add_root(command);
+found_th:
+	HASH_FIND_PTR(debug_conds, &cond, cv);
+	if (cv != NULL) {
+		goto found_cv;
+	}
+	hinfof("thread: %s (%p): %s with invalid condition '%p'", th->name, th, command, cond);
+	hinfof("    at: %s %s:%d", func, file, line);
+	hassert((cv != NULL) && "invalid condition");
+	debug_thread_unlock();
+	return -1;
+found_cv:
 	debug_thread_unlock();
 	return 0;
 }
