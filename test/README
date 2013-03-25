@@ -46,6 +46,22 @@
     destroy condition
     destroy mutex                          
 
+24  init condition                         init condition
+    init mutex                             timed wait on condition, mutex
+    lock mutex                             ** invalid mutex **
+    timed wait on condition, mutex
+    unlock mutex
+    destroy condition
+    destroy mutex                          
+
+29  init mutexes                           init mutexes
+    init condition                         init condition
+    lock mutex 0                           lock mutex 0
+    timed wait on condition, mutex 0       timed wait on condition, mutex 1
+    unlock mutex 0                         ** mutex not locked **
+    destroy condition
+    destroy mutexes
+
 28  init mutexes                           init mutexes
     init condition                         init condition
     lock mutex 0                           lock mutex 0
@@ -53,14 +69,6 @@
     unlock mutex 1                         timed wait on condition, mutex 0
     timed wait on condition, mutex 0       ** lock order will be violated **
     unlock mutex 0
-    destroy condition
-    destroy mutexes
-
-29  init mutexes                           init mutexes
-    init condition                         init condition
-    lock mutex 0                           lock mutex 0
-    timed wait on condition, mutex 0       timed wait on condition, mutex 1
-    unlock mutex 0                         ** mutex not locked **
     destroy condition
     destroy mutexes
 

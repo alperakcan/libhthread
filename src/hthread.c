@@ -200,6 +200,7 @@ int HTHREAD_FUNCTION_NAME(cond_wait_actual) (struct hthread_cond *cond, struct h
 		}
 	}
 #else
+	debug_cond_check(cond, "cond wait", func, file, line);
 	debug_mutex_del_lock(mutex, "cond wait", func, file, line);
 	r = pthread_cond_wait(&cond->cond, &mutex->mutex);
 	debug_mutex_add_lock(mutex, "cond wait", func, file, line);
@@ -246,6 +247,7 @@ int HTHREAD_FUNCTION_NAME(cond_timedwait_actual) (struct hthread_cond *cond, str
 		tspec.tv_sec += 1;
 		tspec.tv_nsec -= 1000000000;
 	}
+	debug_cond_check(cond, "cond timedwait", func, file, line);
 	debug_mutex_del_lock(mutex, "cond timedwait", func, file, line);
 again:  ret = pthread_cond_timedwait(&cond->cond, &mutex->mutex, &tspec);
 	switch (ret) {
