@@ -54,7 +54,7 @@
     destroy condition
     destroy mutex                          
 
-29  init mutexes                           init mutexes
+25  init mutexes                           init mutexes
     init condition                         init condition
     lock mutex 0                           lock mutex 0
     timed wait on condition, mutex 0       timed wait on condition, mutex 1
@@ -62,7 +62,7 @@
     destroy condition
     destroy mutexes
 
-28  init mutexes                           init mutexes
+26  init mutexes                           init mutexes
     init condition                         init condition
     lock mutex 0                           lock mutex 0
     lock mutex 1                           lock mutex 1
