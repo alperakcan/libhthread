@@ -7,9 +7,10 @@
   hthread is for detecting synchronization errors in c/c++ programs that use the pthreads.
 
   can detect errors of:
-    1. misuses of pthreads api
-    2. lock ordering violation
-    3. lock contention
+  
+  1. misuses of pthreads api
+  2. lock ordering violation
+  3. lock contention
 
 ### 1.1 misuses of pthreads api ###
 
