@@ -29,8 +29,13 @@
 
 05  init mutex                             init mutex
     lock mutex                             unlock mutex
-    unlock mutex                           **unlocking a unheld mutex **
+    unlock mutex                           ** unlocking a unheld mutex **
     destroy mutex
+
+06  init mutex                             init mutex
+    lock mutex                             lock mutex
+    unlock mutex                           destroy mutex
+    destroy mutex                          ** destroying a locked mutex **
 
 20  init condition                         destroy condition
     destroy condition                      ** invalid condition **
@@ -89,6 +94,20 @@
     thread: lock mutex                     thread: unlock mutex
     thread: unlock mutex                   ** unlocking mutex currently held **
     main  : unlock mutex                   ** by other thread **
+    main  : join thread
+    main  : destroy mutex
+
+43  main  : init mutex 0                   main  : init mutex 0
+    main  : init mutex 1                   main  : init mutex 1
+    main  : lock mutex 0                   main  : lock mutex 0
+    main  : lock mutex 1                   main  : lock mutex 1
+    main  : create thread                  main  : create thread
+    thread: lock mutex 0                   thread: lock mutex 1
+    thread: lock mutex 1                   thread: lock mutex 0
+    thread: unlock mutex 0                 ** lock order violated **
+    thread: unlock mutex 1
+    main  : unlock mutex 0
+    main  : unlock mutex 1
     main  : join thread
     main  : destroy mutex
   

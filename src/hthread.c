@@ -24,32 +24,34 @@
 #include "uthash.h"
 
 static pthread_mutex_t debugf_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+#define hdebug_lock() pthread_mutex_lock(&debugf_mutex);
+#define hdebug_unlock() pthread_mutex_unlock(&debugf_mutex);
+
 #if 0
 #define hdebugf(a...) { \
-	pthread_mutex_lock(&debugf_mutex); \
+	hdebug_lock(); \
 	fprintf(stderr, "hthread::debug: "); \
 	fprintf(stderr, a); \
 	fprintf(stderr, " (%s %s:%d)\n", __FUNCTION__, __FILE__, __LINE__); \
-	pthread_mutex_unlock(&debugf_mutex); \
+	hdebug_unlock(); \
 }
 #else
 #define hdebugf(a...)
 #endif
 
 #define hinfof(a...) { \
-	pthread_mutex_lock(&debugf_mutex); \
 	fprintf(stderr, "(hthread) "); \
 	fprintf(stderr, a); \
 	fprintf(stderr, "\n"); \
-	pthread_mutex_unlock(&debugf_mutex); \
 }
 
 #define herrorf(a...) { \
-	pthread_mutex_lock(&debugf_mutex); \
+	hdebug_lock(); \
 	fprintf(stderr, "hthread::error: "); \
 	fprintf(stderr, a); \
 	fprintf(stderr, " (%s %s:%d)\n", __FUNCTION__, __FILE__, __LINE__); \
-	pthread_mutex_unlock(&debugf_mutex); \
+	hdebug_unlock(); \
 }
 
 #define hassert(a) { \
@@ -57,12 +59,12 @@ static pthread_mutex_t debugf_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
 #define hassertf(a...) { \
-	pthread_mutex_lock(&debugf_mutex); \
+	hdebug_lock(); \
 	fprintf(stderr, "hthread::assert: "); \
 	fprintf(stderr, a); \
 	fprintf(stderr, " (%s %s:%d)\n", __FUNCTION__, __FILE__, __LINE__); \
 	assert(0); \
-	pthread_mutex_unlock(&debugf_mutex); \
+	hdebug_unlock(); \
 }
 
 struct hthread_arg {
@@ -188,8 +190,10 @@ static inline int hthread_add_actual (struct hthread *thread, const char *func, 
 #endif
 	HASH_ADD(hh, hthreads, thread, sizeof(thread->thread), thread);
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
-	hinfof("thread: %s (%p) created", thread->name, thread);
+	hdebug_lock();
+	hinfof("new thread created: '%s (%p)'", thread->name, thread);
 	hinfof("    at: %s %s:%d", func, file, line);
+	hdebug_unlock();
 #endif
 	return 0;
 }
@@ -216,7 +220,9 @@ static inline struct hthread * hthread_add_root (const char *command)
 #else
 	if (hthread_root != NULL) {
 #endif
+		hdebug_lock();
 		hinfof("%s within unknown thread", command);
+		hdebug_unlock();
 		hassert(0 && "invalid thread");
 	}
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
@@ -302,8 +308,11 @@ found_sth:
 		goto found_th;
 	}
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
-	hinfof("thread: %s (%p): %s with invalid argument '%p'", sth->name, sth, command, thread);
+	hdebug_lock();
+	hinfof("%s with invalid thread: '%p'", command, thread);
+	hinfof("    by: %s (%p)", sth->name, sth);
 	hinfof("    at: %s %s:%d", func, file, line);
+	hdebug_unlock();
 #else
 	(void) func;
 	(void) file;
@@ -345,8 +354,10 @@ found_sth:
 		}
 	}
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
+	hdebug_lock();
 	hinfof("thread: %s (%p): %s with invalid argument '%p'", sth->name, sth, command, thread);
 	hinfof("    at: %s %s:%d", func, file, line);
+	hdebug_unlock();
 #else
 	(void) func;
 	(void) file;
@@ -357,10 +368,12 @@ found_sth:
 	return -1;
 found_th:
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
+	hdebug_lock();
 	hinfof("thread: %s (%p) deleted", thread->name, thread);
 	hinfof("  created at: %s %s:%d", thread->func, thread->file, thread->line);
 	hinfof("  deleted by: %s (%p)", sth->name, sth);
 	hinfof("          at: %s %s:%d", func, file, line);
+	hdebug_unlock();
 #else
 	(void) func;
 	(void) file;
@@ -672,7 +685,7 @@ int HTHREAD_FUNCTION_NAME(detach_actual) (struct hthread *thread, const char *fu
 		return 0;
 	}
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
-	hthread_check(thread, "join", func, file, line);
+	hthread_check(thread, "detach", func, file, line);
 #endif
 	pthread_detach(thread->thread);
 	hthread_del(thread, "detach", func, file, line);
@@ -764,19 +777,27 @@ found_th:
 	if (mt != NULL) {
 		goto found_mt;
 	}
-	hinfof("thread: %s (%p): %s with invalid mutex '%p'", th->name, th, command, mutex);
+	hdebug_lock();
+	hinfof("%s with invalid mutex: '%p'", command, mutex);
+	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	hdebug_unlock();
 	hassert((mt != NULL) && "invalid mutex");
 	hthread_unlock();
 	return -1;
 found_mt:
 	HASH_FIND_PTR(th->locks, mutex, mtl);
 	if (mtl != NULL) {
-		hinfof("thread: %s (%p): %s with already hold mutex %s (%p)", th->name, th, command, mutex->name, mutex);
+		hdebug_lock();
+		hinfof("%s with already held mutex: '%s (%p)'", command, mutex->name, mutex);
+		hinfof("    by: %s (%p)", th->name, th);
 		hinfof("    at: %s %s:%d", func, file, line);
 		hinfof("  previously acquired");
 		hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
 		hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
+		hinfof("  created '%s (%p)'", mutex->name, mutex);
+		hinfof("    at: %s %s:%d", mutex->func, mutex->file, mutex->line);
+		hdebug_unlock();
 		hassert((mt == NULL) && "mutex is already locked");
 		hthread_unlock();
 		return -1;
@@ -830,19 +851,25 @@ found_mt:
 				  th->name,
 				  func, file, line,
 				  mtl->func, mtl->file, mtl->line);
-			hinfof("thread: %s (%p): %s order '%s (%p) before %s (%p)' violated", th->name, th, command, mutex->name, mutex, mtl->mutex->name, mtl->mutex);
-			hinfof("  incorrect order is: acquisition of %s (%p)", mtl->mutex->name, mtl->mutex);
-			hinfof("      by: %s (%p)", th->name, th);
+			hdebug_lock();
+			hinfof("%s order '%s (%p)' before '%s (%p)' violated", command, mutex->name, mutex, mtl->mutex->name, mtl->mutex);
+			hinfof("  incorrect order is: acquisition of '%s (%p)'", mtl->mutex->name, mtl->mutex);
+			hinfof("      by: %s (%p)", mtl->thread->name, mtl->thread);
 			hinfof("      at: %s %s:%d", mtl->func, mtl->file, mtl->line);
-			hinfof("    followed by a later acquisition of %s (%p)", mutex->name, mutex);
+			hinfof("    followed by a later acquisition of '%s (%p)'", mutex->name, mutex);
 			hinfof("      by: %s (%p)", th->name, th);
 			hinfof("      at: %s %s:%d", func, file, line);
-			hinfof("  required order is: acquisition of %s (%p)", mto->key.first->name, mto->key.first);
+			hinfof("  required order is: acquisition of '%s (%p)'", mto->key.first->name, mto->key.first);
 			hinfof("      by: %s (%p)", mto->info.first.thread->name, mto->info.first.thread);
 			hinfof("      at: %s %s:%d", mto->info.first.func, mto->info.first.file, mto->info.first.line);
-			hinfof("    followed by a later acquisition of %s (%p)", mto->key.second->name, mto->key.second);
+			hinfof("    followed by a later acquisition of '%s (%p)'", mto->key.second->name, mto->key.second);
 			hinfof("      by: %s (%p)", mto->info.second.thread->name, mto->info.second.thread);
 			hinfof("      at: %s %s:%d", mto->info.second.func, mto->info.second.file, mto->info.second.line);
+			hinfof("  created '%s (%p)'", mtl->mutex->name, mtl->mutex);
+			hinfof("    at: %s %s:%d", mtl->mutex->func, mtl->mutex->file, mtl->mutex->line);
+			hinfof("  created '%s (%p)'", mutex->name, mutex);
+			hinfof("    at: %s %s:%d", mutex->func, mutex->file, mutex->line);
+			hdebug_unlock();
 			hassert((mto == NULL) && "lock order violation");
 			continue;
 		}
@@ -952,8 +979,11 @@ found_th:
 	if (mt != NULL) {
 		goto found_mt;
 	}
-	hinfof("thread: %s (%p): %s with invalid mutex '%p'", th->name, th, command, mutex);
+	hdebug_lock();
+	hinfof("%s with invalid mutex '%p'", command, mutex);
+	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	hdebug_unlock();
 	hassert((mt != NULL) && "invalid mutex");
 	hthread_unlock();
 	return -1;
@@ -964,19 +994,27 @@ found_mt:
 	}
 	mtl = debug_mutex_find_lock(mutex, func, file, line);
 	if (mtl != NULL) {
-		hinfof("thread: %s (%p): %s with mutex '%s (%p)' currently hold by other thread '%s (%p)'", th->name, th, command, mutex->name, mutex, mtl->thread->name, mtl->thread);
+		hdebug_lock();
+		hinfof("%s with a mutex '%s (%p)' currently hold by other thread", command, mutex->name, mutex);
 		hinfof("    by: %s (%p)", th->name, th);
 		hinfof("    at: %s %s:%d", func, file, line);
 		hinfof("  lock observed");
 		hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
 		hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
+		hinfof("  created '%s (%p)'", mutex->name, mutex);
+		hinfof("    at: %s %s:%d", mutex->func, mutex->file, mutex->line);
+		hdebug_unlock();
 		hassert((mtl == NULL) && "mutex is locked by other thread");
 		hthread_unlock();
 		return -1;
 	}
-	hinfof("thread: %s (%p): %s with un-held mutex '%s (%p)'", th->name, th, command, mutex->name, mutex);
+	hdebug_lock();
+	hinfof("%s with unheld mutex: '%s (%p)'", command, mutex->name, mutex);
 	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	hinfof("  created '%s (%p)'", mutex->name, mutex);
+	hinfof("    at: %s %s:%d", mutex->func, mutex->file, mutex->line);
+	hdebug_unlock();
 	hassert((mtl != NULL) && "mutex is not locked");
 	hthread_unlock();
 	return -1;
@@ -1040,15 +1078,28 @@ found_th:
 	if (mt != NULL) {
 		goto found_mt;
 	}
-	hinfof("thread: %s (%p): %s with invalid mutex '%p'", th->name, th, command, mutex);
+	hdebug_lock();
+	hinfof("%s with invalid mutex: '%p'", command, mutex);
+	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	hdebug_unlock();
 	hassert((mt != NULL) && "invalid mutex");
 	hthread_unlock();
 	return -1;
 found_mt:
 	HASH_FIND_PTR(th->locks, mutex, mtl);
 	if (mtl != NULL) {
-		hassertf("mutex: %s is still locked", mutex->name);
+		hdebug_lock();
+		hinfof("%s with currently locked mutex: '%p'", command, mutex);
+		hinfof("    by: %s (%p)", th->name, th);
+		hinfof("    at: %s %s:%d", func, file, line);
+		hinfof("  lock observed");
+		hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
+		hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
+		hinfof("  created '%s (%p)", mtl->mutex->name, mtl->mutex);
+		hinfof("    at: %s %s:%d", mtl->mutex->func, mtl->mutex->file, mtl->mutex->line);
+		hdebug_unlock();
+		hassert((mt == NULL) && "invalid mutex");
 		hthread_unlock();
 		return -1;
 	}
@@ -1112,8 +1163,11 @@ found_th:
 	if (cv != NULL) {
 		goto found_cv;
 	}
-	hinfof("thread: %s (%p): %s with invalid condition '%p'", th->name, th, command, cond);
+	hdebug_lock();
+	hinfof("%s with invalid condition: '%p'", command, cond);
+	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	hdebug_unlock();
 	hassert((cv != NULL) && "invalid condition");
 	hthread_unlock();
 	return -1;
@@ -1141,8 +1195,11 @@ found_th:
 	if (cv != NULL) {
 		goto found_cv;
 	}
-	hinfof("thread: %s (%p): %s with invalid condition '%p'", th->name, th, command, cond);
+	hdebug_lock();
+	hinfof("%s with invalid condition: '%p'", command, cond);
+	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	hdebug_unlock();
 	hassert((cv != NULL) && "invalid condition");
 	hthread_unlock();
 	return -1;

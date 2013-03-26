@@ -20,7 +20,22 @@ static void * worker (void *arg)
 	int rc;
 	pthread_mutex_t *m;
 	m = arg;
-	rc = pthread_mutex_unlock(m);
+	rc = pthread_mutex_lock(&m[1]);
+	if (rc != 0) {
+		fprintf(stderr, "pthread_mutex_lock failed\n");
+		exit(-1);
+	}
+	rc = pthread_mutex_lock(&m[0]);
+	if (rc != 0) {
+		fprintf(stderr, "pthread_mutex_lock failed\n");
+		exit(-1);
+	}
+	rc = pthread_mutex_unlock(&m[0]);
+	if (rc != 0) {
+		fprintf(stderr, "pthread_mutex_lock failed\n");
+		exit(-1);
+	}
+	rc = pthread_mutex_unlock(&m[1]);
 	if (rc != 0) {
 		fprintf(stderr, "pthread_mutex_lock failed\n");
 		exit(-1);
@@ -32,22 +47,42 @@ int main (int argc, char *argv[])
 {
 	int rc;
 	pthread_t t;
-	pthread_mutex_t m;
+	pthread_mutex_t m[2];
 	(void) argc;
 	(void) argv;
-	rc = pthread_mutex_init(&m, NULL);
+	rc = pthread_mutex_init(&m[0], NULL);
 	if (rc != 0) {
 		fprintf(stderr, "pthread_mutex_init failed\n");
 		exit(-1);
 	}
-	rc = pthread_mutex_lock(&m);
+	rc = pthread_mutex_init(&m[1], NULL);
+	if (rc != 0) {
+		fprintf(stderr, "pthread_mutex_init failed\n");
+		exit(-1);
+	}
+	rc = pthread_mutex_lock(&m[0]);
 	if (rc != 0) {
 		fprintf(stderr, "pthread_mutex_lock failed\n");
 		exit(-1);
 	}
-	rc = pthread_create(&t, NULL, worker, &m);
+	rc = pthread_mutex_lock(&m[1]);
+	if (rc != 0) {
+		fprintf(stderr, "pthread_mutex_lock failed\n");
+		exit(-1);
+	}
+	rc = pthread_create(&t, NULL, worker, &m[0]);
 	if (rc != 0) {
 		fprintf(stderr, "pthread_create failed\n");
+		exit(-1);
+	}
+	rc = pthread_mutex_unlock(&m[0]);
+	if (rc != 0) {
+		fprintf(stderr, "pthread_mutex_lock failed\n");
+		exit(-1);
+	}
+	rc = pthread_mutex_unlock(&m[1]);
+	if (rc != 0) {
+		fprintf(stderr, "pthread_mutex_lock failed\n");
 		exit(-1);
 	}
 	rc = pthread_join(t, NULL);
@@ -55,7 +90,12 @@ int main (int argc, char *argv[])
 		fprintf(stderr, "pthread_join failed\n");
 		exit(-1);
 	}
-	rc = pthread_mutex_destroy(&m);
+	rc = pthread_mutex_destroy(&m[0]);
+	if (rc != 0) {
+		fprintf(stderr, "pthread_mutex_destroy failed\n");
+		exit(-1);
+	}
+	rc = pthread_mutex_destroy(&m[1]);
 	if (rc != 0) {
 		fprintf(stderr, "pthread_mutex_destroy failed\n");
 		exit(-1);
