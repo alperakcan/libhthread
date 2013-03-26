@@ -23,20 +23,20 @@
   than to deal with hard-to-find bugs.
   
   1. destroying an invalid mutex - <a href="test/fail-00.c">fail-00.c</a>, <a href="#311-destroying-an-invalid-mutex">report</a>
-  2. locking an invalid mutex - <a href="test/fail-01.c">fail-01.c</a>
-  3. unlocking an invalid mutex - <a href="test/fail-02.c">fail-02.c</a>
-  4. locking an already locked mutex - <a href="test/fail-03.c">fail-03.c</a>
-  5. unlocking an unheld mutex - <a href="test/fail-05.c">fail-05.c</a>
-  6. destroying a locked mutex - <a href="test/fail-06.c">fail-06.c</a>
-  7. destroying an invalid condition - <a href="test/fail-20.c">fail-20.c</a>
-  8. signaling an invalid condition - <a href="test/fail-21.c">fail-21.c</a>
-  9. broadcasting an invalid condition - <a href="test/fail-22.c">fail-22.c</a>
-  10. [timed]waiting on an invalid condition - <a href="test/fail-23.c">fail-23.c</a>
-  11. [timed]waiting on an invalid mutex - <a href="test/fail-24.c">fail-24.c</a>
-  12. [timed]waiting on an unheld mutex - <a href="test/fail-25.c">fail-25.c</a>
-  13. join invalid thread - <a href="test/fail-40.c">fail-40.c</a>
-  14. detach invalid thread - <a href="test/fail-41.c">fail-41.c</a>
-  15. unlocking mutex that was held by other thread - <a href="test/fail-42.c">fail-42.c</a>
+  2. locking an invalid mutex - <a href="test/fail-01.c">fail-01.c</a>, <a href="#312-locking-an-invalid-mutex">report</a>
+  3. unlocking an invalid mutex - <a href="test/fail-02.c">fail-02.c</a>, <a href="#313-unlocking-an-invalid-mutex">report</a>
+  4. locking an already locked mutex - <a href="test/fail-03.c">fail-03.c</a>, <a href="#314-locking-an-already-locked-mutex">report</a>
+  5. unlocking an unheld mutex - <a href="test/fail-05.c">fail-05.c</a>, <a href="#315-unlocking-an-unheld-mutex">report</a>
+  6. destroying a locked mutex - <a href="test/fail-06.c">fail-06.c</a>, <a href="#316-destroying-a-locked-mutex">report</a>
+  7. destroying an invalid condition - <a href="test/fail-20.c">fail-20.c</a>, <a href="#317-destroying-an-invalid-condition">report</a>
+  8. signaling an invalid condition - <a href="test/fail-21.c">fail-21.c</a>, <a href="#318-signaling-an-invalid-condition">report</a>
+  9. broadcasting an invalid condition - <a href="test/fail-22.c">fail-22.c</a>, <a href="#319-broadcasting-an-invalid-condition">report</a>
+  10. [timed]waiting on an invalid condition - <a href="test/fail-23.c">fail-23.c</a>, <a href="#3110-timedwaiting-on-an-invalid-condition">report</a>
+  11. [timed]waiting on an invalid mutex - <a href="test/fail-24.c">fail-24.c</a>, <a href="#3111-timedwaiting-on-an-invalid-mutex">report</a>
+  12. [timed]waiting on an unheld mutex - <a href="test/fail-25.c">fail-25.c</a>, <a href="#3112-timedwaiting-on-an-unheld-mutex">report</a>
+  13. join invalid thread - <a href="test/fail-40.c">fail-40.c</a>, <a href="#3113-join-invalid-thread">report</a>
+  14. detach invalid thread - <a href="test/fail-41.c">fail-41.c</a>, <a href="#3113-join-invalid-thread">report</a>
+  15. unlocking mutex that was held by other thread - <a href="test/fail-42.c">fail-42.c</a>, <a href="#3115-unlocking-mutex-that-was-held-by-other-thread">report</a>
 
 ### 1.2 lock ordering violation ###
 
