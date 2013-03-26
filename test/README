@@ -127,7 +127,7 @@ Unit tests behaviours and expected results
     main  : create thread                  main  : create thread
     main  : sleep 3                        main  : sleep 3
     thread: lock mutex                     thread: lock mutex
-    ** try lock threshold reached **      ** try lock threshold reached **
+    ** try lock threshold reached **       ** try lock threshold reached **
     ** still waiting on mutex **           ** still waiting on mutex **
     thread: unlock mutex                   ** assert requested **
     main  : unlock mutex
@@ -140,5 +140,5 @@ Unit tests behaviours and expected results
     lock mutex                             lock mutex
     sleep 3                                sleep 3
     unlock mutex                           unlock mutex
-    ** lock threshold reached **          ** lock threshold reached **         
+    ** lock threshold reached **           ** lock threshold reached **         
     destroy mutex                          ** assert requested **

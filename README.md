@@ -1,19 +1,23 @@
-hthread
-========
+# hthread #
 
 hthread is a threads helper library with synchronization errors detection support.
 
-overview
---------
+## 1. overview ##
 
 hthread is for detecting synchronization errors in c/c++ programs that use the pthreads.
 
 can detect errors of:
   1. misuses of pthreads api
-  2. potential deadlocks arising from lock ordering mismatches
+  2. lock ordering violation
+  3. lock contention
 
-license
--------
+### 1.1 misuses of pthreads api ###
+
+### 1.2 lock ordering violation ###
+
+### 1.3 lock contention ###
+
+## 2. license ##
 
 Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
 
