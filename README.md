@@ -13,7 +13,7 @@ can detect errors of:
 
 ### 1.1 misuses of pthreads api ###
 
-  - destroying an invalid mutex (test 00)
+  - destroying an invalid mutex (<a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-00.c">test 00</a>)
   - locking an invalid mutex (test 01)
   - unlocking an invalid mutex (test 02)
   - locking an already locked mutex (test 03)
