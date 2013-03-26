@@ -8,7 +8,7 @@
 
   can detect errors of:
   
-  1. misuses of pthreads api <a href="#11-misuses-of-pthreads-api">--></a>
+  1. <a href="#11-misuses-of-pthreads-api">misuses of pthreads api</a>
   2. lock ordering violation
   3. lock contention
 
