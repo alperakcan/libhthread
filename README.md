@@ -4,7 +4,8 @@
   
   1. <a href="#1-overview">overview</a>
   2. <a href="#2-configuration">configuration</a>
-  3. <a href="#3-license">license</a>
+  3. <a href="#3-error-reports">error reports</a>
+  4. <a href="#4-license">license</a>
 
 ## 1. overview ##
 
@@ -94,7 +95,9 @@
     
     > terminate if locking operation takes longer than the specified time, in miliseconds.
 
-## 3. license ##
+## 3. error reports ##
+
+## 4. license ##
 
   Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
 
