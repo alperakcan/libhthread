@@ -111,31 +111,164 @@
 
 #### 3.1.2. locking an invalid mutex
 
+    # ./test/fail-01-debug 
+    (hthread:22639) new thread created: 'root-process (0x9dc010)'
+    (hthread:22639)     at: (null) (null):0
+    (hthread:22639) mutex lock with invalid mutex: '0x7fff281824d8'
+    (hthread:22639)     by: root-process (0x9dc010)
+    (hthread:22639)     at: main fail-01.c:23
+    fail-01-debug: hthread.c:807: debug_mutex_add_lock: Assertion `(mt != ((void *)0)) && "invalid mutex"' failed.
+
 #### 3.1.3. unlocking an invalid mutex
+
+    # ./test/fail-02-debug 
+    (hthread:22655) new thread created: 'root-process (0xf61010)'
+    (hthread:22655)     at: (null) (null):0
+    (hthread:22655) mutex unlock with invalid mutex '0x7fffe8330fc8'
+    (hthread:22655)     by: root-process (0xf61010)
+    (hthread:22655)     at: main fail-02.c:23
+    fail-02-debug: hthread.c:1083: debug_mutex_del_lock: Assertion `(mt != ((void *)0)) && "invalid mutex"' failed.
 
 #### 3.1.4. locking an already locked mutex
 
+    # ./test/fail-03-debug 
+    (hthread:22671) new thread created: 'root-process (0x112d0c0)'
+    (hthread:22671)     at: (null) (null):0
+    (hthread:22671) mutex lock with already held mutex: 'mutex(main fail-03.c:22) (0x112d010)'
+    (hthread:22671)     by: root-process (0x112d0c0)
+    (hthread:22671)     at: main fail-03.c:32
+    (hthread:22671)   previously acquired
+    (hthread:22671)     by: root-process (0x112d0c0)
+    (hthread:22671)     at: main fail-03.c:27
+    (hthread:22671)   created 'mutex(main fail-03.c:22) (0x112d010)'
+    (hthread:22671)     at: main fail-03.c:22
+    fail-03-debug: hthread.c:823: debug_mutex_add_lock: Assertion `(mt == ((void *)0)) && "mutex is already locked"' failed.
+
 #### 3.1.5. unlocking an unheld mutex
+
+    # ./test/fail-05-debug 
+    (hthread:22688) new thread created: 'root-process (0x106b0c0)'
+    (hthread:22688)     at: (null) (null):0
+    (hthread:22688) mutex unlock with unheld mutex: 'mutex(main fail-05.c:22) (0x106b010)'
+    (hthread:22688)     by: root-process (0x106b0c0)
+    (hthread:22688)     at: main fail-05.c:27
+    (hthread:22688)   created 'mutex(main fail-05.c:22) (0x106b010)'
+    (hthread:22688)     at: main fail-05.c:22
+    fail-05-debug: hthread.c:1114: debug_mutex_del_lock: Assertion `(mtl != ((void *)0)) && "mutex is not locked"' failed.
 
 #### 3.1.6. destroying a locked mutex
 
+    # ./test/fail-06-debug 
+    (hthread:22704) new thread created: 'root-process (0xc7d0c0)'
+    (hthread:22704)     at: (null) (null):0
+    (hthread:22704) mutex destroy with currently locked mutex: '0xc7d010'
+    (hthread:22704)     by: root-process (0xc7d0c0)
+    (hthread:22704)     at: main fail-06.c:32
+    (hthread:22704)   lock observed
+    (hthread:22704)     by: root-process (0xc7d0c0)
+    (hthread:22704)     at: main fail-06.c:27
+    (hthread:22704)   created 'mutex(main fail-06.c:22) (0xc7d010)
+    (hthread:22704)     at: main fail-06.c:22
+    fail-06-debug: hthread.c:1218: debug_mutex_del: Assertion `(mt == ((void *)0)) && "invalid mutex"' failed.
+
 #### 3.1.7. destroying an invalid condition
+
+    # ./test/fail-20-debug 
+    (hthread:22720) new thread created: 'root-process (0x20ec010)'
+    (hthread:22720)     at: (null) (null):0
+    (hthread:22720) cond destroy with invalid condition: '0x7fff8a9a43e8'
+    (hthread:22720)     by: root-process (0x20ec010)
+    (hthread:22720)     at: main fail-20.c:23
+    fail-20-debug: hthread.c:1287: debug_cond_del: Assertion `(cv != ((void *)0)) && "invalid condition"' failed.
 
 #### 3.1.8. signaling an invalid condition
 
+    # ./test/fail-21-debug 
+    (hthread:22737) new thread created: 'root-process (0x842010)'
+    (hthread:22737)     at: (null) (null):0
+    (hthread:22737) cond signal with invalid condition: '0x7fffa37ddd38'
+    (hthread:22737)     by: root-process (0x842010)
+    (hthread:22737)     at: main fail-21.c:23
+    fail-21-debug: hthread.c:1319: debug_cond_check: Assertion `(cv != ((void *)0)) && "invalid condition"' failed.
+
 #### 3.1.9. broadcasting an invalid condition
+
+    # ./test/fail-22-debug 
+    (hthread:22753) new thread created: 'root-process (0xa24010)'
+    (hthread:22753)     at: (null) (null):0
+    (hthread:22753) cond signal with invalid condition: '0x7fff5c00acb8'
+    (hthread:22753)     by: root-process (0xa24010)
+    (hthread:22753)     at: main fail-22.c:23
+    fail-22-debug: hthread.c:1319: debug_cond_check: Assertion `(cv != ((void *)0)) && "invalid condition"' failed.
 
 #### 3.1.10. [timed]waiting on an invalid condition
 
+    # ./test/fail-23-debug 
+    (hthread:22769) new thread created: 'root-process (0x1e700c0)'
+    (hthread:22769)     at: (null) (null):0
+    (hthread:22769) cond timedwait with invalid condition: '0x7fff3f3d3308'
+    (hthread:22769)     by: root-process (0x1e700c0)
+    (hthread:22769)     at: main fail-23.c:43
+    fail-23-debug: hthread.c:1319: debug_cond_check: Assertion `(cv != ((void *)0)) && "invalid condition"' failed.
+
 #### 3.1.11. [timed]waiting on an invalid mutex
+
+    # ./test/fail-24-debug 
+    (hthread:22785) new thread created: 'root-process (0x13300c0)'
+    (hthread:22785)     at: (null) (null):0
+    (hthread:22785) cond timedwait with invalid mutex '0x7fff760defe8'
+    (hthread:22785)     by: root-process (0x13300c0)
+    (hthread:22785)     at: main fail-24.c:38
+    fail-24-debug: hthread.c:1083: debug_mutex_del_lock: Assertion `(mt != ((void *)0)) && "invalid mutex"' failed.
 
 #### 3.1.12. [timed]waiting on an unheld mutex
 
+    # ./test/fail-25-debug 
+    (hthread:22802) new thread created: 'root-process (0x22330c0)'
+    (hthread:22802)     at: (null) (null):0
+    (hthread:22802) cond timedwait with unheld mutex: 'mutex(main fail-25.c:32) (0x2233600)'
+    (hthread:22802)     by: root-process (0x22330c0)
+    (hthread:22802)     at: main fail-25.c:52
+    (hthread:22802)   created 'mutex(main fail-25.c:32) (0x2233600)'
+    (hthread:22802)     at: main fail-25.c:32
+    fail-25-debug: hthread.c:1114: debug_mutex_del_lock: Assertion `(mtl != ((void *)0)) && "mutex is not locked"' failed.
+
 #### 3.1.13. join invalid thread
+
+    # ./test/fail-40-debug 
+    (hthread:22825) new thread created: 'root-process (0x1741010)'
+    (hthread:22825)     at: (null) (null):0
+    (hthread:22825) join with invalid thread: '0x7fff6b67cd98'
+    (hthread:22825)     by: root-process (0x1741010)
+    (hthread:22825)     at: main fail-40.c:25
+    fail-40-debug: hthread.c:344: hthread_check: Assertion `(th == thread) && "invalid thread"' failed.
 
 #### 3.1.14. detach invalid thread
 
+    # ./test/fail-41-debug 
+    (hthread:22843) new thread created: 'root-process (0x2438010)'
+    (hthread:22843)     at: (null) (null):0
+    (hthread:22843) detach with invalid thread: '0x7fff672803c8'
+    (hthread:22843)     by: root-process (0x2438010)
+    (hthread:22843)     at: main fail-41.c:25
+    fail-41-debug: hthread.c:344: hthread_check: Assertion `(th == thread) && "invalid thread"' failed.
+
 #### 3.1.15. unlocking mutex that was held by other thread
+
+    # ./test/fail-42-debug 
+    (hthread:22859) new thread created: 'root-process (0xb0a0c0)'
+    (hthread:22859)     at: (null) (null):0
+    (hthread:22859) new thread created: 'thread(main fail-42.c:48) (0xb0a8d0)'
+    (hthread:22859)     at: main fail-42.c:48
+    (hthread:22859) mutex unlock with a mutex 'mutex(main fail-42.c:38) (0xb0a010)' currently hold by other thread
+    (hthread:22859)     by: thread(main fail-42.c:48) (0xb0a8d0)
+    (hthread:22859)     at: worker fail-42.c:23
+    (hthread:22859)   lock observed
+    (hthread:22859)     by: root-process (0xb0a0c0)
+    (hthread:22859)     at: main fail-42.c:43
+    (hthread:22859)   created 'mutex(main fail-42.c:38) (0xb0a010)'
+    (hthread:22859)     at: main fail-42.c:38
+    fail-42-debug: hthread.c:1103: debug_mutex_del_lock: Assertion `(mtl == ((void *)0)) && "mutex is locked by other thread"' failed.
 
 ### 3.2 lock ordering violation ###
 
