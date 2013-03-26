@@ -17,7 +17,7 @@
   hthread is able to detect and report following errors. Although some of them are too obvious, early detection is much better
   than to deal with hard-to-find bugs.
   
-  - destroying an invalid mutex - [https://github.com/anhanguera/libhthread/blob/master/test/fail-00.c] fail-00.c
+  - destroying an invalid mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-00.c">fail-00.c</a>
   - locking an invalid mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-01.c">fail-01.c</a>
   - unlocking an invalid mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-02.c">fail-02.c</a>
   - locking an already locked mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-03.c">fail-03.c</a>
