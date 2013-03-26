@@ -97,6 +97,42 @@
 
 ## 3. error reports ##
 
+### 3.1 misuses of pthreads api ###
+
+#### 3.1.1. destroying an invalid mutex
+
+#### 3.1.2. locking an invalid mutex
+
+#### 3.1.3. unlocking an invalid mutex
+
+#### 3.1.4. locking an already locked mutex
+
+#### 3.1.5. unlocking an unheld mutex
+
+#### 3.1.6. destroying a locked mutex
+
+#### 3.1.7. destroying an invalid condition
+
+#### 3.1.8. signaling an invalid condition
+
+#### 3.1.9. broadcasting an invalid condition
+
+#### 3.1.10. [timed]waiting on an invalid condition
+
+#### 3.1.11. [timed]waiting on an invalid mutex
+
+#### 3.1.12. [timed]waiting on an unheld mutex
+
+#### 3.1.13. join invalid thread
+
+#### 3.1.14. detach invalid thread
+
+#### 3.1.15. unlocking mutex that was held by other thread
+
+### 3.2 lock ordering violation ###
+
+### 3.3 lock contention ###
+
 ## 4. license ##
 
   Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
