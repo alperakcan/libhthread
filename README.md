@@ -67,11 +67,13 @@
   - hthread_assert_on_error
   
     > default yes
+    
     > terminate the process on any pthreads api misuse and/or lock order violation.
   
   - hthread_lock_hreashold
   
     > default 5000 miliseconds
+    
     > print report if lock is held longer than the specified time, in miliseconds.
   
   - hthread_lock_hreashold_assert
