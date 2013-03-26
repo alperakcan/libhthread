@@ -79,16 +79,19 @@
   - hthread_lock_hreashold_assert
   
     > default no
+    
     > terminate if lock is held longer than the specified time, in miliseconds.
   
   - hthread_lock_try_threshold
   
     > default 5000 miliseconds
+    
     > print report if locking operation takes longer than the specified time, in miliseconds.
   
   - hthread_lock_try_threshold_assert
   
     > default no
+    
     > terminate if locking operation takes longer than the specified time, in miliseconds.
 
 ## 3. license ##
