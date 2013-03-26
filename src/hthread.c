@@ -1012,7 +1012,7 @@ found_mt_:
 			hinfof("  created '%s (%p)'", mutex->name, mutex);
 			hinfof("    at: %s %s:%d", mutex->func, mutex->file, mutex->line);
 			hdebug_unlock();
-			hassert((a == 0) && "mutex try lock threashold reached");
+			hassert((a == 0) && "mutex try lock threshold reached");
 			t = 0;
 			hthread_unlock();
 		}
@@ -1128,7 +1128,7 @@ found_lc:
 		hinfof("  created '%s (%p)'", mutex->name, mutex);
 		hinfof("    at: %s %s:%d", mutex->func, mutex->file, mutex->line);
 		hdebug_unlock();
-		hassert((a == 0) && "mutex try lock threashold reached");
+		hassert((a == 0) && "mutex lock threshold reached");
 	}
 	hdebugf("deleted lock mutex: %s @ %p, from thread: %s @ %p", mutex->name, mutex, th->name, th);
 	free(mtl);
