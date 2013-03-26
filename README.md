@@ -430,6 +430,8 @@
 
 ## 4. test cases ##
 
+### 4.1 mutex tests ###
+
   <table>
     <tr valign="top">
       <th>test</th>
@@ -555,6 +557,16 @@
       destroy mutex                          <br>
       ** destroying a locked mutex **        <br>
       </td>
+    </tr>
+  </table>
+
+### 4.2 condition tests ###
+
+  <table>
+    <tr valign="top">
+      <th>test</th>
+      <th>sucess</th>
+      <th>fail</th>
     </tr>
     <tr valign="top">
       <td>
@@ -688,6 +700,16 @@
       ** lock order will be violated **      <br>
       </td>
     </tr>
+  </table>
+
+### 4.3 thread tests ###
+
+  <table>
+    <tr valign="top">
+      <th>test</th>
+      <th>sucess</th>
+      <th>fail</th>
+    </tr>
     <tr valign="top">
       <td>
       <a href="test/success-40.c">sucess-40.c</a><br> 
@@ -770,6 +792,16 @@
       thread: lock mutex 0                   <br>
       ** lock order violation **             <br>
       </td>
+    </tr>
+  </table>
+
+### 4.4 lock contention tests ###
+
+  <table>
+    <tr valign="top">
+      <th>test</th>
+      <th>sucess</th>
+      <th>fail</th>
     </tr>
     <tr valign="top">
       <td>
