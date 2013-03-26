@@ -134,8 +134,8 @@ Unit tests behaviours and expected results
     main  : join thread
     main  : destroy mutex
 
-61  hthread_lock_hreashold = 1000          hthread_lock_threshold = 1000
-    hthread_lock_assert = 0                hthread_lock_assert = 1
+61  hthread_lock_threshold = 1000          hthread_lock_threshold = 1000
+    hthread_lock_threshold_assert = 0      hthread_lock_threshold_assert = 1
     init mutex                             init mutex
     lock mutex                             lock mutex
     sleep 3                                sleep 3

@@ -436,18 +436,380 @@
       <th>sucess</th>
       <th>fail</th>
     </tr>
-    <tr>
-      <td>
-      00
-      </td>
-      <td>
-          init mutex<br>
-          destroy mutex
-      </td>
-      <td>
-      Awesome
-      </td>
-    </tr>
+<tr>
+  <td>
+  00 
+  </td>
+  <td>
+  init mutex                             <br>
+  destroy mutex                          <br>
+  </td>
+  <td>
+  destroy mutex                          <br>
+  ** invalid mutex **                    <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  01 
+  </td>
+  <td>
+  init mutex                             <br>
+  lock mutex                             <br>
+  unlock mutex                           <br>
+  destroy mutex                          <br>
+  </td>
+  <td>
+  lock mutex                             <br>
+  ** invalid mutex **                    <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  02 
+  </td>
+  <td>
+  init mutex                             <br>
+  lock mutex                             <br>
+  unlock mutex                           <br>
+  destroy mutex                          <br>
+  </td>
+  <td>
+  unlock mutex                           <br>
+  ** invalid mutex **                    <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  03 
+  </td>
+  <td>
+  init mutex                             <br>
+  lock mutex                             <br>
+  unlock mutex                           <br>
+  destroy mutex                          <br>
+  </td>
+  <td>
+  init mutex                             <br>
+  lock mutex                             <br>
+  lock mutex                             <br>
+  ** mutex is already locked **          <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  04 
+  </td>
+  <td>
+  init mutexes                           <br>
+  lock mutexes 0...n                     <br>
+  unlock mutexes 0...n                   <br>
+  lock mutexes 0...n                     <br>
+  unlock mutexes 0...n                   <br>
+  destroy mutexes                        <br>
+  </td>
+  <td>
+  init mutexes                           <br>
+  lock mutexes 0...n                     <br>
+  unlock mutexes 0...n                   <br>
+  lock mutexes n...0                     <br>
+  ** lock order violation **             <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  05 
+  </td>
+  <td>
+  init mutex                             <br>
+  lock mutex                             <br>
+  unlock mutex                           <br>
+  destroy mutex                          <br>
+  </td>
+  <td>
+  init mutex                             <br>
+  unlock mutex                           <br>
+  ** unlocking a unheld mutex **         <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  06 
+  </td>
+  <td>
+  init mutex                             <br>
+  lock mutex                             <br>
+  unlock mutex                           <br>
+  destroy mutex                          <br>
+  </td>
+  <td>
+  init mutex                             <br>
+  lock mutex                             <br>
+  destroy mutex                          <br>
+  ** destroying a locked mutex **        <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  20 
+  </td>
+  <td>
+  init condition                         <br>
+  destroy condition                      <br>
+  </td>
+  <td>
+  destroy condition                      <br>
+  ** invalid condition **                <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  21 
+  </td>
+  <td>
+  init condition                         <br>
+  signal condition                       <br>
+  destroy condition                      <br>
+  </td>
+  <td>
+  signal condition                       <br>
+  ** invalid condition **                <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  22 
+  </td>
+  <td>
+  init condition                         <br>
+  broadcast condition                    <br>
+  destroy condition                      <br>
+  </td>
+  <td>
+  broadcast condition                    <br>
+  ** invalid condition **                <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  23 
+  </td>
+  <td>
+  init condition                         <br>
+  init mutex                             <br>
+  lock mutex                             <br>
+  timed wait on condition, mutex         <br>
+  unlock mutex                           <br>
+  destroy condition                      <br>
+  destroy mutex                          <br>
+  </td>
+  <td>
+  init mutex                             <br>
+  lock mutex                             <br>
+  timed wait on condition, mutex         <br>
+  ** invalid condition **                <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  24 
+  </td>
+  <td>
+  init condition                         <br>
+  init mutex                             <br>
+  lock mutex                             <br>
+  timed wait on condition, mutex         <br>
+  unlock mutex                           <br>
+  destroy condition                      <br>
+  destroy mutex                          <br>
+  </td>
+  <td>
+  init condition                         <br>
+  timed wait on condition, mutex         <br>
+  ** invalid mutex **                    <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  25 
+  </td>
+  <td>
+  init mutexes                           <br>
+  init condition                         <br>
+  lock mutex 0                           <br>
+  timed wait on condition, mutex 0       <br>
+  unlock mutex 0                         <br>
+  destroy condition                      <br>
+  destroy mutexes                        <br>
+  </td>
+  <td>
+  init mutexes                           <br>
+  init condition                         <br>
+  lock mutex 0                           <br>
+  timed wait on condition, mutex 1       <br>
+  ** mutex not locked **                 <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  26 
+  </td>
+  <td>
+  init mutexes                           <br>
+  init condition                         <br>
+  lock mutex 0                           <br>
+  lock mutex 1                           <br>
+  unlock mutex 1                         <br>
+  timed wait on condition, mutex 0       <br>
+  unlock mutex 0                         <br>
+  destroy condition                      <br>
+  destroy mutexes                        <br>
+  </td>
+  <td>
+  init mutexes                           <br>
+  init condition                         <br>
+  lock mutex 0                           <br>
+  lock mutex 1                           <br>
+  timed wait on condition, mutex 0       <br>
+  ** lock order will be violated **      <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  40 
+  </td>
+  <td>
+  create thread                          <br>
+  join thread                            <br>
+  </td>
+  <td>
+  join thread                            <br>
+  ** invalid thread **                   <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  41 
+  </td>
+  <td>
+  create thread                          <br>
+  detach thread                          <br>
+  </td>
+  <td>
+  detach thread                          <br>
+  ** invalid thread **                   <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  42 
+  </td>
+  <td>
+  main  : init mutex                     <br>
+  main  : lock mutex                     <br>
+  main  : create thread                  <br>
+  thread: lock mutex                     <br>
+  thread: unlock mutex                   <br>
+  main  : unlock mutex                   <br>
+  main  : join thread                    <br>
+  main  : destroy mutex                  <br>
+  </td>
+  <td>
+  main  : init mutex                     <br>
+  main  : lock mutex                     <br>
+  main  : create thread                  <br>
+  thread: unlock mutex                   <br>
+  ** unlocking mutex currently held **   <br>
+  ** by other thread **                  <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  43 
+  </td>
+  <td>
+  main  : init mutex 0                   <br>
+  main  : init mutex 1                   <br>
+  main  : lock mutex 0                   <br>
+  main  : lock mutex 1                   <br>
+  main  : create thread                  <br>
+  thread: lock mutex 0                   <br>
+  thread: lock mutex 1                   <br>
+  thread: unlock mutex 0                 <br>
+  thread: unlock mutex 1                 <br>
+  main  : unlock mutex 0                 <br>
+  main  : unlock mutex 1                 <br>
+  main  : join thread                    <br>
+  main  : destroy mutex                  <br>
+  </td>
+  <td>
+  main  : init mutex 0                   <br>
+  main  : init mutex 1                   <br>
+  main  : lock mutex 0                   <br>
+  main  : lock mutex 1                   <br>
+  main  : create thread                  <br>
+  thread: lock mutex 1                   <br>
+  thread: lock mutex 0                   <br>
+  ** lock order violation **             <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  60 
+  </td>
+  <td>
+  hthread_lock_try_threshold = 1000      <br>
+  hthread_lock_try_threshold_assert = 0  <br>
+  main  : init mutex                     <br>
+  main  : lock mutex                     <br>
+  main  : create thread                  <br>
+  main  : sleep 3                        <br>
+  thread: lock mutex                     <br>
+  ** try lock threshold reached **       <br>
+  ** still waiting on mutex **           <br>
+  thread: unlock mutex                   <br>
+  main  : unlock mutex                   <br>
+  main  : join thread                    <br>
+  main  : destroy mutex                  <br>
+  </td>
+  <td>
+  hthread_lock_try_threshold = 1000      <br>
+  hthread_lock_try_threshold_assert = 1  <br>
+  main  : init mutex                     <br>
+  main  : lock mutex                     <br>
+  main  : create thread                  <br>
+  main  : sleep 3                        <br>
+  thread: lock mutex                     <br>
+  ** try lock threshold reached **       <br>
+  ** still waiting on mutex **           <br>
+  ** assert requested **                 <br>
+  </td>
+</tr>
+<tr>
+  <td>
+  61 
+  </td>
+  <td>
+  hthread_lock_threshold = 1000          <br>
+  hthread_lock_threshold_assert = 0      <br>
+  init mutex                             <br>
+  lock mutex                             <br>
+  sleep 3                                <br>
+  unlock mutex                           <br>
+  ** lock threshold reached **           <br>
+  destroy mutex                          <br>
+  </td>
+  <td>
+  hthread_lock_threshold = 1000          <br>
+  hthread_lock_assert = 1                <br>
+  init mutex                             <br>
+  lock mutex                             <br>
+  sleep 3                                <br>
+  unlock mutex                           <br>
+  ** lock threshold reached **           <br>
+  ** assert requested **                 <br>
+  </td>
+</tr>
   </table>
 
 ## 5. license ##
