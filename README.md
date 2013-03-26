@@ -101,6 +101,14 @@
 
 #### 3.1.1. destroying an invalid mutex
 
+    # ./test/fail-00-debug 
+    (hthread:22594) new thread created: 'root-process (0x2179010)'
+    (hthread:22594)     at: (null) (null):0
+    (hthread:22594) mutex destroy with invalid mutex: '0x7ffff1bf8938'
+    (hthread:22594)     by: root-process (0x2179010)
+    (hthread:22594)     at: main fail-00.c:23
+    fail-00-debug: hthread.c:1202: debug_mutex_del: Assertion `(mt != ((void *)0)) && "invalid mutex"' failed.
+
 #### 3.1.2. locking an invalid mutex
 
 #### 3.1.3. unlocking an invalid mutex
