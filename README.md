@@ -867,7 +867,70 @@
 
 ## 5. usage example ##
 
-  using hthread is pretty simple, just add <tt>-include hthread.h</tt> to cflags, and link with <tt>-lhthread</tt>
+  using hthread is pretty simple, just add <tt>-include hthread.h -DHTHREAD_DEBUG=1</tt> to cflags, and link with <tt>-lhthread -lrt</tt>
+  
+  let below is the source code - with double lock error - to be monitored:
+  
+    1  #include <stdio.h>
+    2  #include <stdlib.h>
+    3  #include <unistd.h>
+    4  #include <pthread.h>
+    5  
+    6  int main (int argc, char *argv[])
+    7  {
+    8    int rc;
+    9    pthread_mutex_t m;
+    10   (void) argc;
+    11   (void) argv;
+    12   rc = pthread_mutex_init(&m, NULL);
+    13   if (rc != 0) {
+	14     fprintf(stderr, "pthread_mutex_init failed\n");
+	15     exit(-1);
+    16   }
+    17   rc = pthread_mutex_lock(&m);
+    18   if (rc != 0) {
+	19     fprintf(stderr, "pthread_mutex_lock failed\n");
+	20     exit(-1);
+	21   }
+	22   rc = pthread_mutex_lock(&m);
+	23   if (rc != 0) {
+    24     fprintf(stderr, "pthread_mutex_lock failed\n");
+	25     exit(-1);
+	26   }
+	27   rc = pthread_mutex_destroy(&m);
+	28   if (rc != 0) {
+    29     fprintf(stderr, "pthread_mutex_destroy failed\n");
+	30     exit(-1);
+	31   }
+	32   return 0;
+    32 }
+    
+  compile and run as usual:
+  
+    # gcc -o app main.c -lpthread
+    # ./app
+    
+  application will not exit, because it is trying to lock a already locked mutex. now, enable
+  monitoring with hthread:
+
+    # gcc -include src/hthread.h -DHTHREAD_DEBUG=1 -o app-debug main.c -Lsrc -lhthread -lrt -lpthread
+    # ./app-debug
+    
+    # LD_LIBRARY_PATH=src ./app-debug
+    (hthread:32648) new thread created: 'root-process (0xab10b0)'
+    (hthread:32648)     at: (null) (null):0
+    (hthread:32648) mutex lock with already held mutex: 'mutex(main main.c:12) (0xab1010)'
+    (hthread:32648)     by: root-process (0xab10b0)
+    (hthread:32648)     at: main main.c:22
+    (hthread:32648)   previously acquired
+    (hthread:32648)     by: root-process (0xab10b0)
+    (hthread:32648)     at: main main.c:17
+    (hthread:32648)   created 'mutex(main main.c:12) (0xab1010)'
+    (hthread:32648)     at: main main.c:12
+    app-debug: hthread.c:823: debug_mutex_add_lock: Assertion `(mt == ((void *)0)) && "mutex is already locked"' failed.
+    
+  hthread detected and reported the error: application was trying to lock an already locked mutex at line 22, which was
+  previously locked at line 17, and was created at line 12.
 
 ## 6. license ##
 

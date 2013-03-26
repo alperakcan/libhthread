@@ -187,6 +187,8 @@ struct hthread_mutex;
 
 #else
 
+#include <pthread.h>
+
 #define HTHREAD_FUNCTION_NAME(function) hthread_ ## function
 
 #endif
