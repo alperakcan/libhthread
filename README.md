@@ -5,7 +5,8 @@
   1. <a href="#1-overview">overview</a>
   2. <a href="#2-configuration">configuration</a>
   3. <a href="#3-error-reports">error reports</a>
-  4. <a href="#4-license">license</a>
+  4. <a href="#4-test-cases">test cases</a>
+  5. <a href="#5-license">license</a>
 
 ## 1. overview ##
 
@@ -44,7 +45,7 @@
   be discovered during testing and lead to hard-to-find bugs.
   
   hthread monitors locks/unlocks and stores them in separate tables for each thread. this allows hthread to build a global lock order
-  table for running process. hthread check for locking order violation against global order table for each lock request, and able to
+  table for running process. hthread checks for locking order violation against global order table for each lock request, and able to
   detect and report following errors.
 
   1. lock order violation in same thread - <a href="test/fail-04.c">fail-04.c</a>, <a href="#321-lock-order-violation-in-same-thread">report</a>
@@ -53,7 +54,7 @@
 
 ### 1.3 lock contention ###
 
-  hthread able to understans and print report about lock contentions - a thread has to wait until requested lock is released. monitoring
+  hthread able to understand and print report about lock contentions - a thread has to wait until requested lock is released. monitoring
   lock contentions is handy because, they usually cause unwanted delays or they may point to an undetected potential deadlock. hthread
   can report followings.
 
@@ -427,7 +428,21 @@
     (hthread:23772)     at: main fail-61.c:22
     fail-61-debug: hthread.c:1140: debug_mutex_del_lock: Assertion `(a == 0) && "mutex lock threshold reached"' failed.
 
-## 4. license ##
+## 4. test cases ##
+
+<table>
+  <tr>
+    <th>ID</th><th>Name</th><th>Rank</th>
+  </tr>
+  <tr>
+    <td>1</td><td>Tom Preston-Werner</td><td>Awesome</td>
+  </tr>
+  <tr>
+    <td>2</td><td>Albert Einstein</td><td>Nearly as awesome</td>
+  </tr>
+</table>
+
+## 5. license ##
 
   Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
 
