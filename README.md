@@ -6,7 +6,8 @@
   2. <a href="#2-configuration">configuration</a>
   3. <a href="#3-error-reports">error reports</a>
   4. <a href="#4-test-cases">test cases</a>
-  5. <a href="#5-license">license</a>
+  5. <a href="#5-usage-example">usage example</a>
+  6. <a href="#6-license">license</a>
 
 ## 1. overview ##
 
@@ -864,7 +865,9 @@
     </tr>
   </table>
 
-## 5. license ##
+## 5. usage example ##
+
+## 6. license ##
 
   Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
 
