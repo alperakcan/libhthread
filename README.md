@@ -48,7 +48,6 @@
 
   - hthread_lock_hreashold (default 10 seconds)
   - hthread_lock_hreashold_assert (default no)
-  
   - hthread_lock_try_threshold (default 10 seconds)
   - hthread_lock_try_threshold_assert (default no)
 
