@@ -455,6 +455,11 @@
 
 ## 4. test cases ##
 
+  1. <a href="#41-mutex-tests">mutex tests</a>
+  2. <a href="#42-condition-tests">condition tests</a>
+  3. <a href="#43-thread-tests">thread tests</a>
+  4. <a href="#44-lock-contention-tests">lock contention tests</a>
+
 ### 4.1 mutex tests ###
 
   <table>
