@@ -4,7 +4,6 @@
   
   1. <a href="#1-overview">overview</a>
   2. <a href="#2-configuration">configuration</a>
-  1. alper
   3. <a href="#3-license">license</a>
 
 ## 1. overview ##
@@ -22,21 +21,21 @@
   hthread is able to detect and report following errors. although some of them are too obvious, early detection is much better
   than to deal with hard-to-find bugs.
   
-  - destroying an invalid mutex - <a href="test/fail-00.c">fail-00.c</a>
-  - locking an invalid mutex - <a href="test/fail-01.c">fail-01.c</a>
-  - unlocking an invalid mutex - <a href="test/fail-02.c">fail-02.c</a>
-  - locking an already locked mutex - <a href="test/fail-03.c">fail-03.c</a>
-  - unlocking an unheld mutex - <a href="test/fail-05.c">fail-05.c</a>
-  - destroying a locked mutex - <a href="test/fail-06.c">fail-06.c</a>
-  - destroying an invalid condition - <a href="test/fail-20.c">fail-20.c</a>
-  - signaling an invalid condition - <a href="test/fail-21.c">fail-21.c</a>
-  - broadcasting an invalid condition - <a href="test/fail-22.c">fail-22.c</a>
-  - [timed]waiting on an invalid condition - <a href="test/fail-23.c">fail-23.c</a>
-  - [timed]waiting on an invalid mutex - <a href="test/fail-24.c">fail-24.c</a>
-  - [timed]waiting on an unheld mutex - <a href="test/fail-25.c">fail-25.c</a>
-  - join invalid thread - <a href="test/fail-40.c">fail-40.c</a>
-  - detach invalid thread - <a href="test/fail-41.c">fail-41.c</a>
-  - unlocking mutex that was held by other thread - <a href="test/fail-42.c">fail-42.c</a>
+  1. destroying an invalid mutex - <a href="test/fail-00.c">fail-00.c</a>
+  2. locking an invalid mutex - <a href="test/fail-01.c">fail-01.c</a>
+  3. unlocking an invalid mutex - <a href="test/fail-02.c">fail-02.c</a>
+  4. locking an already locked mutex - <a href="test/fail-03.c">fail-03.c</a>
+  5. unlocking an unheld mutex - <a href="test/fail-05.c">fail-05.c</a>
+  6. destroying a locked mutex - <a href="test/fail-06.c">fail-06.c</a>
+  7. destroying an invalid condition - <a href="test/fail-20.c">fail-20.c</a>
+  8. signaling an invalid condition - <a href="test/fail-21.c">fail-21.c</a>
+  9. broadcasting an invalid condition - <a href="test/fail-22.c">fail-22.c</a>
+  10. [timed]waiting on an invalid condition - <a href="test/fail-23.c">fail-23.c</a>
+  11. [timed]waiting on an invalid mutex - <a href="test/fail-24.c">fail-24.c</a>
+  12. [timed]waiting on an unheld mutex - <a href="test/fail-25.c">fail-25.c</a>
+  13. join invalid thread - <a href="test/fail-40.c">fail-40.c</a>
+  14. detach invalid thread - <a href="test/fail-41.c">fail-41.c</a>
+  15. unlocking mutex that was held by other thread - <a href="test/fail-42.c">fail-42.c</a>
 
 ### 1.2 lock ordering violation ###
 
@@ -47,9 +46,9 @@
   table for running process. hthread check for locking order violation against global order table for each lock request, and able to
   detect and report following errors.
 
-  - lock order violation in same thread - <a href="test/fail-04.c">fail-04.c</a>
-  - lock order violation while [timed]waiting on condition - <a href="test/fail-26.c">fail-26.c</a>
-  - lock order violation between threads - <a href="test/fail-43.c">fail-43.c</a>
+  1. lock order violation in same thread - <a href="test/fail-04.c">fail-04.c</a>
+  2. lock order violation while [timed]waiting on condition - <a href="test/fail-26.c">fail-26.c</a>
+  3. lock order violation between threads - <a href="test/fail-43.c">fail-43.c</a>
 
 ### 1.3 lock contention ###
 
@@ -57,8 +56,8 @@
   lock contentions is handy because, they usually cause unwanted delays or they may point to an undetected potential deadlock. hthread
   can report followings.
 
-  - waiting to lock a mutex more than allowed threshold - <a href="test/fail-60.c">fail-60.c</a>
-  - hold a mutex lock more than allowed threshold - <a href="test/fail-61.c">fail-61.c</a>
+  1. waiting to lock a mutex more than allowed threshold - <a href="test/fail-60.c">fail-60.c</a>
+  2. hold a mutex lock more than allowed threshold - <a href="test/fail-61.c">fail-61.c</a>
 
 ## 2. configuration ##
 
