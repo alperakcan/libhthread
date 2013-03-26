@@ -18,20 +18,20 @@
   than to deal with hard-to-find bugs.
   
   - destroying an invalid mutex - <a href="test/fail-00.c">fail-00.c</a>
-  - locking an invalid mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-01.c">fail-01.c</a>
-  - unlocking an invalid mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-02.c">fail-02.c</a>
-  - locking an already locked mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-03.c">fail-03.c</a>
-  - unlocking an unheld mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-05.c">fail-05.c</a>
-  - destroying a locked mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-06.c">fail-06.c</a>
-  - destroying an invalid condition - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-20.c">fail-20.c</a>
-  - signaling an invalid condition - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-21.c">fail-21.c</a>
-  - broadcasting an invalid condition - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-22.c">fail-22.c</a>
-  - [timed]waiting on an invalid condition - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-23.c">fail-23.c</a>
-  - [timed]waiting on an invalid mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-24.c">fail-24.c</a>
-  - [timed]waiting on an unheld mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-25.c">fail-25.c</a>
-  - join invalid thread - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-40.c">fail-40.c</a>
-  - detach invalid thread - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-41.c">fail-41.c</a>
-  - unlocking mutex that was held by other thread - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-42.c">fail-42.c</a>
+  - locking an invalid mutex - <a href="test/fail-01.c">fail-01.c</a>
+  - unlocking an invalid mutex - <a href="test/fail-02.c">fail-02.c</a>
+  - locking an already locked mutex - <a href="test/fail-03.c">fail-03.c</a>
+  - unlocking an unheld mutex - <a href="test/fail-05.c">fail-05.c</a>
+  - destroying a locked mutex - <a href="test/fail-06.c">fail-06.c</a>
+  - destroying an invalid condition - <a href="test/fail-20.c">fail-20.c</a>
+  - signaling an invalid condition - <a href="test/fail-21.c">fail-21.c</a>
+  - broadcasting an invalid condition - <a href="test/fail-22.c">fail-22.c</a>
+  - [timed]waiting on an invalid condition - <a href="test/fail-23.c">fail-23.c</a>
+  - [timed]waiting on an invalid mutex - <a href="test/fail-24.c">fail-24.c</a>
+  - [timed]waiting on an unheld mutex - <a href="test/fail-25.c">fail-25.c</a>
+  - join invalid thread - <a href="test/fail-40.c">fail-40.c</a>
+  - detach invalid thread - <a href="test/fail-41.c">fail-41.c</a>
+  - unlocking mutex that was held by other thread - <a href="test/fail-42.c">fail-42.c</a>
 
 ### 1.2 lock ordering violation ###
 
@@ -42,9 +42,9 @@
   table for running process. hthread check for locking order violation against global order table for each lock request, and able to
   detect and report following errors.
 
-  - lock order violation in same thread - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-04.c">fail-04.c</a>
-  - lock order violation while [timed]waiting on condition - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-26.c">fail-26.c</a>
-  - lock order violation between threads - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-43.c">fail-43.c</a>
+  - lock order violation in same thread - <a href="test/fail-04.c">fail-04.c</a>
+  - lock order violation while [timed]waiting on condition - <a href="test/fail-26.c">fail-26.c</a>
+  - lock order violation between threads - <a href="test/fail-43.c">fail-43.c</a>
 
 ### 1.3 lock contention ###
 
@@ -52,8 +52,8 @@
   lock contentions is handy because, they usually cause unwanted delays or they may point to an undetected potential deadlock. hthread
   can report followings.
 
-  - waiting to lock a mutex more than allowed threshold - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-60.c">fail-60.c</a>
-  - hold a mutex lock more than allowed threshold - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-61.c">fail-61.c</a>
+  - waiting to lock a mutex more than allowed threshold - <a href="test/fail-60.c">fail-60.c</a>
+  - hold a mutex lock more than allowed threshold - <a href="test/fail-61.c">fail-61.c</a>
 
 ## 2. configuration ##
 
