@@ -4,7 +4,7 @@
   
   1. <a href="#1-overview">overview</a>
   2. <a href="#2-configuration">configuration</a>
-  2.1. alper
+  1. alper
   3. <a href="#3-license">license</a>
 
 ## 1. overview ##
