@@ -57,7 +57,11 @@
 
 ## 2. configuration ##
 
+  hthread reads configuration parameters from environment via getenv function call. one can either set/change environment variables in source
+  code of monitored project via setenv function call, or set them globally in running shell using export function.
+  
   - hthread_lock_hreashold (default 10 seconds)
+    defines ahouehoaui eaouhe
   - hthread_lock_hreashold_assert (default no)
   - hthread_lock_try_threshold (default 10 seconds)
   - hthread_lock_try_threshold_assert (default no)
