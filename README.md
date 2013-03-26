@@ -437,9 +437,16 @@
       <th>fail</th>
     </tr>
     <tr>
-      <td>00</td>
-      <td>Tom Preston-Werner</td>
-      <td>Awesome</td>
+      <td>
+      00
+      </td>
+      <td>
+      init mutex
+      destroy mutex
+      </td>
+      <td>
+      Awesome
+      </td>
     </tr>
   </table>
 
