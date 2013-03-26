@@ -1117,13 +1117,13 @@ found_mt:
 found_lc:
 	HASH_DEL(th->locks, mtl);
 	timeval = debug_getclock();
-	v = hthread_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_NAME);
+	v = hthread_getenv_int(HTHREAD_LOCK_THRESHOLD_NAME);
 	if (v == (unsigned int) -1) {
-		v = HTHREAD_LOCK_TRY_THRESHOLD;
+		v = HTHREAD_LOCK_THRESHOLD;
 	}
-	a = hthread_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_ASSERT_NAME);
+	a = hthread_getenv_int(HTHREAD_LOCK_THRESHOLD_ASSERT_NAME);
 	if (a == (unsigned int) -1) {
-		a = HTHREAD_LOCK_TRY_THRESHOLD_ASSERT;
+		a = HTHREAD_LOCK_THRESHOLD_ASSERT;
 	}
 	if ((mtl->timeval > timeval) ||
 	    (mtl->timeval + v) < timeval) {

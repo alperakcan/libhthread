@@ -99,7 +99,7 @@
 
 ### 3.1 misuses of pthreads api ###
 
-#### 3.1.1. destroying an invalid mutex
+#### 3.1.1. destroying an invalid mutex ####
 
     # ./test/fail-00-debug 
     (hthread:22594) new thread created: 'root-process (0x2179010)'
@@ -109,7 +109,7 @@
     (hthread:22594)     at: main fail-00.c:23
     fail-00-debug: hthread.c:1202: debug_mutex_del: Assertion `(mt != ((void *)0)) && "invalid mutex"' failed.
 
-#### 3.1.2. locking an invalid mutex
+#### 3.1.2. locking an invalid mutex ####
 
     # ./test/fail-01-debug 
     (hthread:22639) new thread created: 'root-process (0x9dc010)'
@@ -119,7 +119,7 @@
     (hthread:22639)     at: main fail-01.c:23
     fail-01-debug: hthread.c:807: debug_mutex_add_lock: Assertion `(mt != ((void *)0)) && "invalid mutex"' failed.
 
-#### 3.1.3. unlocking an invalid mutex
+#### 3.1.3. unlocking an invalid mutex ####
 
     # ./test/fail-02-debug 
     (hthread:22655) new thread created: 'root-process (0xf61010)'
@@ -129,7 +129,7 @@
     (hthread:22655)     at: main fail-02.c:23
     fail-02-debug: hthread.c:1083: debug_mutex_del_lock: Assertion `(mt != ((void *)0)) && "invalid mutex"' failed.
 
-#### 3.1.4. locking an already locked mutex
+#### 3.1.4. locking an already locked mutex ####
 
     # ./test/fail-03-debug 
     (hthread:22671) new thread created: 'root-process (0x112d0c0)'
@@ -144,7 +144,7 @@
     (hthread:22671)     at: main fail-03.c:22
     fail-03-debug: hthread.c:823: debug_mutex_add_lock: Assertion `(mt == ((void *)0)) && "mutex is already locked"' failed.
 
-#### 3.1.5. unlocking an unheld mutex
+#### 3.1.5. unlocking an unheld mutex ####
 
     # ./test/fail-05-debug 
     (hthread:22688) new thread created: 'root-process (0x106b0c0)'
@@ -156,7 +156,7 @@
     (hthread:22688)     at: main fail-05.c:22
     fail-05-debug: hthread.c:1114: debug_mutex_del_lock: Assertion `(mtl != ((void *)0)) && "mutex is not locked"' failed.
 
-#### 3.1.6. destroying a locked mutex
+#### 3.1.6. destroying a locked mutex ####
 
     # ./test/fail-06-debug 
     (hthread:22704) new thread created: 'root-process (0xc7d0c0)'
@@ -171,7 +171,7 @@
     (hthread:22704)     at: main fail-06.c:22
     fail-06-debug: hthread.c:1218: debug_mutex_del: Assertion `(mt == ((void *)0)) && "invalid mutex"' failed.
 
-#### 3.1.7. destroying an invalid condition
+#### 3.1.7. destroying an invalid condition ####
 
     # ./test/fail-20-debug 
     (hthread:22720) new thread created: 'root-process (0x20ec010)'
@@ -181,7 +181,7 @@
     (hthread:22720)     at: main fail-20.c:23
     fail-20-debug: hthread.c:1287: debug_cond_del: Assertion `(cv != ((void *)0)) && "invalid condition"' failed.
 
-#### 3.1.8. signaling an invalid condition
+#### 3.1.8. signaling an invalid condition ####
 
     # ./test/fail-21-debug 
     (hthread:22737) new thread created: 'root-process (0x842010)'
@@ -191,7 +191,7 @@
     (hthread:22737)     at: main fail-21.c:23
     fail-21-debug: hthread.c:1319: debug_cond_check: Assertion `(cv != ((void *)0)) && "invalid condition"' failed.
 
-#### 3.1.9. broadcasting an invalid condition
+#### 3.1.9. broadcasting an invalid condition ####
 
     # ./test/fail-22-debug 
     (hthread:22753) new thread created: 'root-process (0xa24010)'
@@ -201,7 +201,7 @@
     (hthread:22753)     at: main fail-22.c:23
     fail-22-debug: hthread.c:1319: debug_cond_check: Assertion `(cv != ((void *)0)) && "invalid condition"' failed.
 
-#### 3.1.10. [timed]waiting on an invalid condition
+#### 3.1.10. [timed]waiting on an invalid condition ####
 
     # ./test/fail-23-debug 
     (hthread:22769) new thread created: 'root-process (0x1e700c0)'
@@ -211,7 +211,7 @@
     (hthread:22769)     at: main fail-23.c:43
     fail-23-debug: hthread.c:1319: debug_cond_check: Assertion `(cv != ((void *)0)) && "invalid condition"' failed.
 
-#### 3.1.11. [timed]waiting on an invalid mutex
+#### 3.1.11. [timed]waiting on an invalid mutex ####
 
     # ./test/fail-24-debug 
     (hthread:22785) new thread created: 'root-process (0x13300c0)'
@@ -221,7 +221,7 @@
     (hthread:22785)     at: main fail-24.c:38
     fail-24-debug: hthread.c:1083: debug_mutex_del_lock: Assertion `(mt != ((void *)0)) && "invalid mutex"' failed.
 
-#### 3.1.12. [timed]waiting on an unheld mutex
+#### 3.1.12. [timed]waiting on an unheld mutex ####
 
     # ./test/fail-25-debug 
     (hthread:22802) new thread created: 'root-process (0x22330c0)'
@@ -233,7 +233,7 @@
     (hthread:22802)     at: main fail-25.c:32
     fail-25-debug: hthread.c:1114: debug_mutex_del_lock: Assertion `(mtl != ((void *)0)) && "mutex is not locked"' failed.
 
-#### 3.1.13. join invalid thread
+#### 3.1.13. join invalid thread ####
 
     # ./test/fail-40-debug 
     (hthread:22825) new thread created: 'root-process (0x1741010)'
@@ -243,7 +243,7 @@
     (hthread:22825)     at: main fail-40.c:25
     fail-40-debug: hthread.c:344: hthread_check: Assertion `(th == thread) && "invalid thread"' failed.
 
-#### 3.1.14. detach invalid thread
+#### 3.1.14. detach invalid thread ####
 
     # ./test/fail-41-debug 
     (hthread:22843) new thread created: 'root-process (0x2438010)'
@@ -253,7 +253,7 @@
     (hthread:22843)     at: main fail-41.c:25
     fail-41-debug: hthread.c:344: hthread_check: Assertion `(th == thread) && "invalid thread"' failed.
 
-#### 3.1.15. unlocking mutex that was held by other thread
+#### 3.1.15. unlocking mutex that was held by other thread ####
 
     # ./test/fail-42-debug 
     (hthread:22859) new thread created: 'root-process (0xb0a0c0)'
@@ -272,7 +272,116 @@
 
 ### 3.2 lock ordering violation ###
 
+#### 3.2.1. lock order violation in same thread ####
+
+    # ./test/fail-04-debug 
+    (hthread:22925) new thread created: 'root-process (0x9740c0)'
+    (hthread:22925)     at: (null) (null):0
+    (hthread:22925) mutex lock order 'mutex(main fail-04.c:26) (0x974760)' before 'mutex(main fail-04.c:26) (0x974810)' violated
+    (hthread:22925)   incorrect order is: acquisition of 'mutex(main fail-04.c:26) (0x974810)'
+    (hthread:22925)       by: root-process (0x9740c0)
+    (hthread:22925)       at: main fail-04.c:47
+    (hthread:22925)     followed by a later acquisition of 'mutex(main fail-04.c:26) (0x974760)'
+    (hthread:22925)       by: root-process (0x9740c0)
+    (hthread:22925)       at: main fail-04.c:47
+    (hthread:22925)   required order is: acquisition of 'mutex(main fail-04.c:26) (0x974760)'
+    (hthread:22925)       by: root-process (0x9740c0)
+    (hthread:22925)       at: main fail-04.c:33
+    (hthread:22925)     followed by a later acquisition of 'mutex(main fail-04.c:26) (0x974810)'
+    (hthread:22925)       by: root-process (0x9740c0)
+    (hthread:22925)       at: main fail-04.c:33
+    (hthread:22925)   created 'mutex(main fail-04.c:26) (0x974810)'
+    (hthread:22925)     at: main fail-04.c:26
+    (hthread:22925)   created 'mutex(main fail-04.c:26) (0x974760)'
+    (hthread:22925)     at: main fail-04.c:26
+    fail-04-debug: hthread.c:895: debug_mutex_add_lock: Assertion `(mto == ((void *)0)) && "lock order violation"' failed.
+
+#### 3.2.2. lock order violation while [timed]waiting on condition ####
+
+    # ./test/fail-26-debug 
+    (hthread:22941) new thread created: 'root-process (0x21c80c0)'
+    (hthread:22941)     at: (null) (null):0
+    (hthread:22941) cond wait order 'mutex(main fail-26.c:32) (0x21c8010)' before 'mutex(main fail-26.c:32) (0x21c8600)' violated
+    (hthread:22941)   incorrect order is: acquisition of 'mutex(main fail-26.c:32) (0x21c8600)'
+    (hthread:22941)       by: root-process (0x21c80c0)
+    (hthread:22941)       at: main fail-26.c:48
+    (hthread:22941)     followed by a later acquisition of 'mutex(main fail-26.c:32) (0x21c8010)'
+    (hthread:22941)       by: root-process (0x21c80c0)
+    (hthread:22941)       at: main fail-26.c:57
+    (hthread:22941)   required order is: acquisition of 'mutex(main fail-26.c:32) (0x21c8010)'
+    (hthread:22941)       by: root-process (0x21c80c0)
+    (hthread:22941)       at: main fail-26.c:43
+    (hthread:22941)     followed by a later acquisition of 'mutex(main fail-26.c:32) (0x21c8600)'
+    (hthread:22941)       by: root-process (0x21c80c0)
+    (hthread:22941)       at: main fail-26.c:48
+    (hthread:22941)   created 'mutex(main fail-26.c:32) (0x21c8600)'
+    (hthread:22941)     at: main fail-26.c:32
+    (hthread:22941)   created 'mutex(main fail-26.c:32) (0x21c8010)'
+    (hthread:22941)     at: main fail-26.c:32
+    fail-26-debug: hthread.c:895: debug_mutex_add_lock: Assertion `(mto == ((void *)0)) && "lock order violation"' failed.
+
+#### 3.2.3. lock order violation between threads ####
+
+    # ./test/fail-43-debug 
+    (hthread:22959) new thread created: 'root-process (0x13db0c0)'
+    (hthread:22959)     at: (null) (null):0
+    (hthread:22959) new thread created: 'thread(main fail-43.c:73) (0x13dbcf0)'
+    (hthread:22959)     at: main fail-43.c:73
+    (hthread:22959) mutex lock order 'mutex(main fail-43.c:53) (0x13db010)' before 'mutex(main fail-43.c:58) (0x13db600)' violated
+    (hthread:22959)   incorrect order is: acquisition of 'mutex(main fail-43.c:58) (0x13db600)'
+    (hthread:22959)       by: thread(main fail-43.c:73) (0x13dbcf0)
+    (hthread:22959)       at: worker fail-43.c:23
+    (hthread:22959)     followed by a later acquisition of 'mutex(main fail-43.c:53) (0x13db010)'
+    (hthread:22959)       by: thread(main fail-43.c:73) (0x13dbcf0)
+    (hthread:22959)       at: worker fail-43.c:28
+    (hthread:22959)   required order is: acquisition of 'mutex(main fail-43.c:53) (0x13db010)'
+    (hthread:22959)       by: root-process (0x13db0c0)
+    (hthread:22959)       at: main fail-43.c:63
+    (hthread:22959)     followed by a later acquisition of 'mutex(main fail-43.c:58) (0x13db600)'
+    (hthread:22959)       by: root-process (0x13db0c0)
+    (hthread:22959)       at: main fail-43.c:68
+    (hthread:22959)   created 'mutex(main fail-43.c:58) (0x13db600)'
+    (hthread:22959)     at: main fail-43.c:58
+    (hthread:22959)   created 'mutex(main fail-43.c:53) (0x13db010)'
+    (hthread:22959)     at: main fail-43.c:53
+    fail-43-debug: hthread.c:895: debug_mutex_add_lock: Assertion `(mto == ((void *)0)) && "lock order violation"' failed.
+
 ### 3.3 lock contention ###
+
+#### 3.3.1. waiting to lock a mutex more than allowed threshold ####
+
+    # hthread_lock_try_threshold=1000 hthread_lock_try_threshold_assert=1 ./test/fail-60-debug 
+    (hthread:23001) new thread created: 'root-process (0x1c240c0)'
+    (hthread:23001)     at: (null) (null):0
+    (hthread:23001) new thread created: 'thread(main fail-60.c:53) (0x1c248d0)'
+    (hthread:23001)     at: main fail-60.c:53
+    (hthread:23001) mutex lock still waiting for mutex: 'mutex(main fail-60.c:43) (0x1c24010)'
+    (hthread:23001)     by: thread(main fail-60.c:53) (0x1c248d0)
+    (hthread:23001)     at: worker fail-60.c:23
+    (hthread:23001)   currently locked
+    (hthread:23001)     by: root-process (0x1c240c0)
+    (hthread:23001)     at: main fail-60.c:48
+    (hthread:23001)   currently locked
+    (hthread:23001)     by: thread(main fail-60.c:53) (0x1c248d0)
+    (hthread:23001)     at: worker fail-60.c:23
+    (hthread:23001)   created 'mutex(main fail-60.c:43) (0x1c24010)'
+    (hthread:23001)     at: main fail-60.c:43
+    fail-60-debug: hthread.c:1024: debug_mutex_try_lock: Assertion `(a == 0) && "mutex try lock threshold reached"' failed.
+
+#### 3.3.2. hold a mutex lock more than allowed threshold ####
+
+    # hthread_lock_threshold=1000 hthread_lock_threshold_assert=1 ./test/fail-61-debug 
+    (hthread:23772) new thread created: 'root-process (0xc3f0c0)'
+    (hthread:23772)     at: (null) (null):0
+    (hthread:23772) mutex unlock with a mutex 'mutex(main fail-61.c:22) (0xc3f010)' hold during 3000 ms
+    (hthread:23772)     by: root-process (0xc3f0c0)
+    (hthread:23772)     at: main fail-61.c:33
+    (hthread:23772)   lock observed
+    (hthread:23772)     by: root-process (0xc3f0c0)
+    (hthread:23772)     at: main fail-61.c:27
+    (hthread:23772)   created 'mutex(main fail-61.c:22) (0xc3f010)'
+    (hthread:23772)     at: main fail-61.c:22
+    fail-61-debug: hthread.c:1140: debug_mutex_del_lock: Assertion `(a == 0) && "mutex lock threshold reached"' failed.
 
 ## 4. license ##
 
