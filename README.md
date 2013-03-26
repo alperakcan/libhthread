@@ -407,8 +407,8 @@
 
 ### 3.3 lock contention ###
 
-  1. <a href=#331-waiting-to-lock-a-mutex-more-than-allowed-threshold">waiting to lock a mutex more than allowed threshold</a>
-  2. <a href=#332-hold-a-mutex-lock-more-than-allowed-threshold">hold a mutex lock more than allowed threshold</a>
+  1. <a href="#331-waiting-to-lock-a-mutex-more-than-allowed-threshold">waiting to lock a mutex more than allowed threshold</a>
+  2. <a href="#332-hold-a-mutex-lock-more-than-allowed-threshold">hold a mutex lock more than allowed threshold</a>
 
 #### 3.3.1. waiting to lock a mutex more than allowed threshold ####
 
