@@ -321,6 +321,10 @@
 
 ### 3.2 lock ordering violation ###
 
+  1. <a href="#321-lock-order-violation-in-same-thread">lock order violation in same thread</a>
+  2. <a href="#322-lock-order-violation-while-timedwaiting-on-condition">lock order violation while [timed]waiting on condition</a>
+  3. <a href="#323-lock-order-violation-between-threads">lock order violation between threads</a>
+
 #### 3.2.1. lock order violation in same thread ####
 
   example code: <a href="test/fail-04.c">fail-04.c</a>
@@ -402,6 +406,9 @@
     fail-43-debug: hthread.c:895: debug_mutex_add_lock: Assertion `(mto == ((void *)0)) && "lock order violation"' failed.
 
 ### 3.3 lock contention ###
+
+  1. <a href=#331-waiting-to-lock-a-mutex-more-than-allowed-threshold">waiting to lock a mutex more than allowed threshold</a>
+  2. <a href=#332-hold-a-mutex-lock-more-than-allowed-threshold">hold a mutex lock more than allowed threshold</a>
 
 #### 3.3.1. waiting to lock a mutex more than allowed threshold ####
 
