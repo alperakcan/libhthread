@@ -1,6 +1,6 @@
 # hthread #
 
-  hthread is a threads helper library with synchronization errors detection support.
+  hthread is a thread error detector and helper library with synchronization errors detection support.
   
   1. <a href="#1-overview">overview</a>
   2. <a href="#2-configuration">configuration</a>
@@ -12,7 +12,7 @@
 
 ## 1. overview ##
 
-  hthread is for detecting synchronization errors in c/c++ programs that use the pthreads.
+  hthread is thread error detector for detecting synchronization errors in c/c++ programs that use the pthreads.
 
   can detect errors of:
   
