@@ -14,7 +14,7 @@
 
 ### 1.1 misuses of pthreads api ###
 
-  hthread is able to detect and report following errors. Although some of them are too obvious, early detection is much better
+  hthread is able to detect and report following errors. although some of them are too obvious, early detection is much better
   than to deal with hard-to-find bugs.
   
   - destroying an invalid mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-00.c">fail-00.c</a>
@@ -39,13 +39,18 @@
   be discovered during testing and lead to hard-to-find bugs.
   
   hthread monitors locks/unlocks and stores them in separate tables for each thread. this allows hthread to build a global lock order
-  table for running process.
+  table for running process. hthread check for locking order violation against global order table for each lock request, and able to
+  detect and report following errors.
 
   - lock order violation in same thread - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-04.c">fail-04.c</a>
   - lock order violation while [timed]waiting on condition - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-26.c">fail-26.c</a>
   - lock order violation between threads - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-43.c">fail-43.c</a>
 
 ### 1.3 lock contention ###
+
+  hthread able to understans and print report about lock contentions - a thread has to wait until requested lock is released. monitoring
+  lock contentions is handy because, they usually cause unwanted delays or they may point to an undetected potential deadlock. hthread
+  can report followings.
 
   - waiting to lock a mutex more than allowed threshold - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-60.c">fail-60.c</a>
   - hold a mutex lock more than allowed threshold - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-61.c">fail-61.c</a>
