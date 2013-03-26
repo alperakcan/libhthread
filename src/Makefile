@@ -3,10 +3,16 @@ target.o-y = \
 	libhthread.o \
 	libhthread-actual.o \
 	libhthread-debug.o
-	
+
+target.so-y = \
+	libhthread.so
+
 libhthread.o_files-y = \
 	libhthread-actual.o \
 	libhthread-debug.o
+
+libhthread.so_files-y = \
+	libhthread.o
 
 libhthread-actual.o_files-y = \
 	hthread.c

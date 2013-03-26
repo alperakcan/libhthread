@@ -867,6 +867,8 @@
 
 ## 5. usage example ##
 
+  using hthread is pretty simple, just add <tt>-include hthread.h</tt> to cflags, and link with <tt>-lhthread</tt>
+
 ## 6. license ##
 
   Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
