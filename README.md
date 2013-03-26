@@ -7,7 +7,8 @@
   3. <a href="#3-error-reports">error reports</a>
   4. <a href="#4-test-cases">test cases</a>
   5. <a href="#5-usage-example">usage example</a>
-  6. <a href="#6-license">license</a>
+  6. <a href="#6-contact">contact</a>
+  7. <a href="#7-license">license</a>
 
 ## 1. overview ##
 
@@ -932,7 +933,11 @@
   hthread detected and reported the error: application was trying to lock an already locked mutex at line 22, which was
   previously locked at line 17, and was created at line 12.
 
-## 6. license ##
+## 6. contact ##
+
+  if you are using the software and/or have any questions, suggestions, etc. please contact with me at alper.akcan@gmail.com
+
+## 7. license ##
 
   Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
 
