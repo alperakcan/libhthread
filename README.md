@@ -1,18 +1,21 @@
 # hthread #
 
-hthread is a threads helper library with synchronization errors detection support.
+  hthread is a threads helper library with synchronization errors detection support.
 
 ## 1. overview ##
 
-hthread is for detecting synchronization errors in c/c++ programs that use the pthreads.
+  hthread is for detecting synchronization errors in c/c++ programs that use the pthreads.
 
-can detect errors of:
-  1. misuses of pthreads api
-  2. lock ordering violation
-  3. lock contention
+  can detect errors of:
+    1. misuses of pthreads api
+    2. lock ordering violation
+    3. lock contention
 
 ### 1.1 misuses of pthreads api ###
 
+  hthread is able to detect and report following errors. Although some of them are too obvious, early detection is much better
+  than to deal with hard-to-find bugs later on.
+  
   - destroying an invalid mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-00.c">fail-00.c</a>
   - locking an invalid mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-01.c">fail-01.c</a>
   - unlocking an invalid mutex - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-02.c">fail-02.c</a>
@@ -44,9 +47,9 @@ can detect errors of:
 
 ## 3. license ##
 
-Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
+  Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
 
-This work is free. It comes without any warranty, to the extent permitted
-by applicable law. You can redistribute it and/or modify it under the terms
-of the Do What The Fuck You Want To Public License, Version 2, as published
-by Sam Hocevar. See the COPYING file for more details.
+  This work is free. It comes without any warranty, to the extent permitted
+  by applicable law. You can redistribute it and/or modify it under the terms
+  of the Do What The Fuck You Want To Public License, Version 2, as published
+  by Sam Hocevar. See the COPYING file for more details.
