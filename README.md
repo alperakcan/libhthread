@@ -1,6 +1,10 @@
 # hthread #
 
   hthread is a threads helper library with synchronization errors detection support.
+  
+  1. <a href="#1-overview">overview</a>
+  2. <a href="#2-configuration">configuration</a>
+  3. <a href="#3-license">license</a>
 
 ## 1. overview ##
 
@@ -60,7 +64,10 @@
   hthread reads configuration parameters from environment via getenv function call. one can either set/change environment variables in source
   code of monitored project via setenv function call, or set them globally in running shell using export function.
   
-  - hthread_assert_on_error (default yes): terminate the process on any pthreads api misuse and/or lock order violation. 
+  - hthread_assert_on_error (default yes)
+  
+    > terminate the process on any pthreads api misuse and/or lock order violation.
+     
   - hthread_lock_hreashold (default 5000 miliseconds): print report if lock is held longer than the specified time, in miliseconds.
   - hthread_lock_hreashold_assert (default no): terminate if lock is held longer than the specified time, in miliseconds.
   - hthread_lock_try_threshold (default 5000 miliseconds): print report if locking operation takes longer than the specified time, in miliseconds.
