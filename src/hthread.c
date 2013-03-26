@@ -54,7 +54,16 @@ static pthread_mutex_t debugf_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
 #define hassert(a) { \
-	assert(a); \
+	unsigned int v; \
+	v = hthread_getenv_int(HTHREAD_ASSERT_ON_ERROR_NAME); \
+	if (v == (unsigned int) -1) { \
+		v = HTHREAD_ASSERT_ON_ERROR; \
+	} \
+	if (v) { \
+		assert(a); \
+	} else { \
+		herrorf(# a); \
+	} \
 }
 
 #define hassertf(a...) { \
@@ -163,6 +172,21 @@ static inline int debug_cond_check (struct hthread_cond *mutex, const char *comm
 #endif
 
 #define HTHREAD_ROOT_PROCESS_NAME	"root-process"
+
+static inline int hthread_getenv_int (const char *name)
+{
+	int r;
+	const char *e;
+	if (name == NULL) {
+		return -1;
+	}
+	e = getenv(name);
+	if (e == NULL) {
+		return -1;
+	}
+	r = atoi(e);
+	return r;
+}
 
 static inline int hthread_add_actual (struct hthread *thread, const char *func, const char *file, const int line)
 {
@@ -737,21 +761,6 @@ static struct hthread_cond *debug_conds = NULL;
 static struct hthread_mutex *debug_mutexes = NULL;
 static struct hthread_mutex_order *debug_orders = NULL;
 
-static inline int debug_getenv_int (const char *name)
-{
-	int r;
-	const char *e;
-	if (name == NULL) {
-		return -1;
-	}
-	e = getenv(name);
-	if (e == NULL) {
-		return -1;
-	}
-	r = atoi(e);
-	return r;
-}
-
 static inline unsigned long long debug_getclock (void)
 {
 	long long tsec;
@@ -966,11 +975,11 @@ found_mt:
 		}
 		usleep(10000);
 		t += 1;
-		v = debug_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_NAME);
+		v = hthread_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_NAME);
 		if (v == (unsigned int) -1) {
 			v = HTHREAD_LOCK_TRY_THRESHOLD;
 		}
-		a = debug_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_ASSERT_NAME);
+		a = hthread_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_ASSERT_NAME);
 		if (a == (unsigned int) -1) {
 			a = HTHREAD_LOCK_TRY_THRESHOLD_ASSERT;
 		}
@@ -1108,11 +1117,11 @@ found_mt:
 found_lc:
 	HASH_DEL(th->locks, mtl);
 	timeval = debug_getclock();
-	v = debug_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_NAME);
+	v = hthread_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_NAME);
 	if (v == (unsigned int) -1) {
 		v = HTHREAD_LOCK_TRY_THRESHOLD;
 	}
-	a = debug_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_ASSERT_NAME);
+	a = hthread_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_ASSERT_NAME);
 	if (a == (unsigned int) -1) {
 		a = HTHREAD_LOCK_TRY_THRESHOLD_ASSERT;
 	}

@@ -13,13 +13,16 @@
 
 #define HTHREAD_DISABLE_YIELD			0
 
-#define HTHREAD_LOCK_THRESHOLD			10000
+#define HTHREAD_ASSERT_ON_ERROR			1
+#define HTHREAD_ASSERT_ON_ERROR_NAME		"hthread_assert_on_error"
+
+#define HTHREAD_LOCK_THRESHOLD			5000
 #define HTHREAD_LOCK_THRESHOLD_NAME		"hthread_lock_threshold"
 
 #define HTHREAD_LOCK_THRESHOLD_ASSERT		0
 #define HTHREAD_LOCK_THRESHOLD_ASSERT_NAME	"hthread_lock_threshold_assert"
 
-#define HTHREAD_LOCK_TRY_THRESHOLD		10000
+#define HTHREAD_LOCK_TRY_THRESHOLD		5000
 #define HTHREAD_LOCK_TRY_THRESHOLD_NAME		"hthread_lock_try_threshold"
 
 #define HTHREAD_LOCK_TRY_THRESHOLD_ASSERT	0
