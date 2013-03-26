@@ -431,12 +431,12 @@
 ## 4. test cases ##
 
   <table>
-    <tr>
+    <tr valign="top">
       <th>test</th>
       <th>sucess</th>
       <th>fail</th>
     </tr>
-<tr>
+<tr valign="top">
   <td>
   00 
   </td>
@@ -449,7 +449,7 @@
   ** invalid mutex **                    <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   01 
   </td>
@@ -464,7 +464,7 @@
   ** invalid mutex **                    <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   02 
   </td>
@@ -479,7 +479,7 @@
   ** invalid mutex **                    <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   03 
   </td>
@@ -496,7 +496,7 @@
   ** mutex is already locked **          <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   04 
   </td>
@@ -516,7 +516,7 @@
   ** lock order violation **             <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   05 
   </td>
@@ -532,7 +532,7 @@
   ** unlocking a unheld mutex **         <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   06 
   </td>
@@ -549,7 +549,7 @@
   ** destroying a locked mutex **        <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   20 
   </td>
@@ -562,7 +562,7 @@
   ** invalid condition **                <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   21 
   </td>
@@ -576,7 +576,7 @@
   ** invalid condition **                <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   22 
   </td>
@@ -590,7 +590,7 @@
   ** invalid condition **                <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   23 
   </td>
@@ -610,7 +610,7 @@
   ** invalid condition **                <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   24 
   </td>
@@ -629,7 +629,7 @@
   ** invalid mutex **                    <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   25 
   </td>
@@ -650,7 +650,7 @@
   ** mutex not locked **                 <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   26 
   </td>
@@ -674,7 +674,7 @@
   ** lock order will be violated **      <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   40 
   </td>
@@ -687,7 +687,7 @@
   ** invalid thread **                   <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   41 
   </td>
@@ -700,7 +700,7 @@
   ** invalid thread **                   <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   42 
   </td>
@@ -723,7 +723,7 @@
   ** by other thread **                  <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   43 
   </td>
@@ -753,7 +753,7 @@
   ** lock order violation **             <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   60 
   </td>
@@ -785,7 +785,7 @@
   ** assert requested **                 <br>
   </td>
 </tr>
-<tr>
+<tr valign="top">
   <td>
   61 
   </td>
