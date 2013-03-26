@@ -929,9 +929,29 @@
     (hthread:32648)   created 'mutex(main main.c:12) (0xab1010)'
     (hthread:32648)     at: main main.c:12
     app-debug: hthread.c:823: debug_mutex_add_lock: Assertion `(mt == ((void *)0)) && "mutex is already locked"' failed.
+    Aborted (core dumped)
     
   hthread detected and reported the error: application was trying to lock an already locked mutex at line 22, which was
-  previously locked at line 17, and was created at line 12.
+  previously locked at line 17, and was created at line 12. and terminated the process.
+
+  program termination on error can be disabled with <tt>hthread_assert_on_error</tt> configuration parameter
+  
+    # hthread_assert_on_error=0 ./app-debug
+    
+    # LD_LIBRARY_PATH=src ./app-debug
+    (hthread:32648) new thread created: 'root-process (0xab10b0)'
+    (hthread:32648)     at: (null) (null):0
+    (hthread:32648) mutex lock with already held mutex: 'mutex(main main.c:12) (0xab1010)'
+    (hthread:32648)     by: root-process (0xab10b0)
+    (hthread:32648)     at: main main.c:22
+    (hthread:32648)   previously acquired
+    (hthread:32648)     by: root-process (0xab10b0)
+    (hthread:32648)     at: main main.c:17
+    (hthread:32648)   created 'mutex(main main.c:12) (0xab1010)'
+    (hthread:32648)     at: main main.c:12
+    hthread::error: (mt == NULL) && "mutex is already locked" (debug_mutex_add_lock hthread.c:823)
+    
+  this time hthread detected and reported the error, but not terminated the process.
 
 ## 6. contact ##
 
