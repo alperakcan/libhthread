@@ -936,9 +936,7 @@
 
   program termination on error can be disabled with <tt>hthread_assert_on_error</tt> configuration parameter
   
-    # hthread_assert_on_error=0 ./app-debug
-    
-    # LD_LIBRARY_PATH=src ./app-debug
+    # hthread_assert_on_error=0 LD_LIBRARY_PATH=src ./app-debug
     (hthread:32648) new thread created: 'root-process (0xab10b0)'
     (hthread:32648)     at: (null) (null):0
     (hthread:32648) mutex lock with already held mutex: 'mutex(main main.c:12) (0xab1010)'
