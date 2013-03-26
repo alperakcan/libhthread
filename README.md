@@ -441,8 +441,8 @@
       00
       </td>
       <td>
-          <code init mutex
-          destroy mutex>
+          init mutex<br>
+          destroy mutex
       </td>
       <td>
       Awesome
