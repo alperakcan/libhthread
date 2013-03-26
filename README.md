@@ -113,6 +113,8 @@
 
 #### 3.1.2. locking an invalid mutex ####
 
+  example code: <a href="test/fail-01.c">fail-01.c</a>
+
     # ./test/fail-01-debug 
     (hthread:22639) new thread created: 'root-process (0x9dc010)'
     (hthread:22639)     at: (null) (null):0
@@ -123,6 +125,8 @@
 
 #### 3.1.3. unlocking an invalid mutex ####
 
+  example code: <a href="test/fail-02.c">fail-02.c</a>
+
     # ./test/fail-02-debug 
     (hthread:22655) new thread created: 'root-process (0xf61010)'
     (hthread:22655)     at: (null) (null):0
@@ -132,6 +136,8 @@
     fail-02-debug: hthread.c:1083: debug_mutex_del_lock: Assertion `(mt != ((void *)0)) && "invalid mutex"' failed.
 
 #### 3.1.4. locking an already locked mutex ####
+
+  example code: <a href="test/fail-03.c">fail-03.c</a>
 
     # ./test/fail-03-debug 
     (hthread:22671) new thread created: 'root-process (0x112d0c0)'
@@ -148,6 +154,8 @@
 
 #### 3.1.5. unlocking an unheld mutex ####
 
+  example code: <a href="test/fail-05.c">fail-05.c</a>
+
     # ./test/fail-05-debug 
     (hthread:22688) new thread created: 'root-process (0x106b0c0)'
     (hthread:22688)     at: (null) (null):0
@@ -159,6 +167,8 @@
     fail-05-debug: hthread.c:1114: debug_mutex_del_lock: Assertion `(mtl != ((void *)0)) && "mutex is not locked"' failed.
 
 #### 3.1.6. destroying a locked mutex ####
+
+  example code: <a href="test/fail-06.c">fail-06.c</a>
 
     # ./test/fail-06-debug 
     (hthread:22704) new thread created: 'root-process (0xc7d0c0)'
@@ -175,6 +185,8 @@
 
 #### 3.1.7. destroying an invalid condition ####
 
+  example code: <a href="test/fail-20.c">fail-20.c</a>
+
     # ./test/fail-20-debug 
     (hthread:22720) new thread created: 'root-process (0x20ec010)'
     (hthread:22720)     at: (null) (null):0
@@ -184,6 +196,8 @@
     fail-20-debug: hthread.c:1287: debug_cond_del: Assertion `(cv != ((void *)0)) && "invalid condition"' failed.
 
 #### 3.1.8. signaling an invalid condition ####
+
+  example code: <a href="test/fail-21.c">fail-21.c</a>
 
     # ./test/fail-21-debug 
     (hthread:22737) new thread created: 'root-process (0x842010)'
@@ -195,6 +209,8 @@
 
 #### 3.1.9. broadcasting an invalid condition ####
 
+  example code: <a href="test/fail-22.c">fail-22.c</a>
+
     # ./test/fail-22-debug 
     (hthread:22753) new thread created: 'root-process (0xa24010)'
     (hthread:22753)     at: (null) (null):0
@@ -204,6 +220,8 @@
     fail-22-debug: hthread.c:1319: debug_cond_check: Assertion `(cv != ((void *)0)) && "invalid condition"' failed.
 
 #### 3.1.10. [timed]waiting on an invalid condition ####
+
+  example code: <a href="test/fail-23.c">fail-23.c</a>
 
     # ./test/fail-23-debug 
     (hthread:22769) new thread created: 'root-process (0x1e700c0)'
@@ -215,6 +233,8 @@
 
 #### 3.1.11. [timed]waiting on an invalid mutex ####
 
+  example code: <a href="test/fail-24.c">fail-24.c</a>
+
     # ./test/fail-24-debug 
     (hthread:22785) new thread created: 'root-process (0x13300c0)'
     (hthread:22785)     at: (null) (null):0
@@ -224,6 +244,8 @@
     fail-24-debug: hthread.c:1083: debug_mutex_del_lock: Assertion `(mt != ((void *)0)) && "invalid mutex"' failed.
 
 #### 3.1.12. [timed]waiting on an unheld mutex ####
+
+  example code: <a href="test/fail-25.c">fail-25.c</a>
 
     # ./test/fail-25-debug 
     (hthread:22802) new thread created: 'root-process (0x22330c0)'
@@ -237,6 +259,8 @@
 
 #### 3.1.13. join invalid thread ####
 
+  example code: <a href="test/fail-40.c">fail-40.c</a>
+
     # ./test/fail-40-debug 
     (hthread:22825) new thread created: 'root-process (0x1741010)'
     (hthread:22825)     at: (null) (null):0
@@ -247,6 +271,8 @@
 
 #### 3.1.14. detach invalid thread ####
 
+  example code: <a href="test/fail-41.c">fail-41.c</a>
+
     # ./test/fail-41-debug 
     (hthread:22843) new thread created: 'root-process (0x2438010)'
     (hthread:22843)     at: (null) (null):0
@@ -256,6 +282,8 @@
     fail-41-debug: hthread.c:344: hthread_check: Assertion `(th == thread) && "invalid thread"' failed.
 
 #### 3.1.15. unlocking mutex that was held by other thread ####
+
+  example code: <a href="test/fail-42.c">fail-42.c</a>
 
     # ./test/fail-42-debug 
     (hthread:22859) new thread created: 'root-process (0xb0a0c0)'
@@ -275,6 +303,8 @@
 ### 3.2 lock ordering violation ###
 
 #### 3.2.1. lock order violation in same thread ####
+
+  example code: <a href="test/fail-04.c">fail-04.c</a>
 
     # ./test/fail-04-debug 
     (hthread:22925) new thread created: 'root-process (0x9740c0)'
@@ -300,6 +330,8 @@
 
 #### 3.2.2. lock order violation while [timed]waiting on condition ####
 
+  example code: <a href="test/fail-26.c">fail-26.c</a>
+
     # ./test/fail-26-debug 
     (hthread:22941) new thread created: 'root-process (0x21c80c0)'
     (hthread:22941)     at: (null) (null):0
@@ -323,6 +355,8 @@
     fail-26-debug: hthread.c:895: debug_mutex_add_lock: Assertion `(mto == ((void *)0)) && "lock order violation"' failed.
 
 #### 3.2.3. lock order violation between threads ####
+
+  example code: <a href="test/fail-43.c">fail-43.c</a>
 
     # ./test/fail-43-debug 
     (hthread:22959) new thread created: 'root-process (0x13db0c0)'
@@ -352,6 +386,10 @@
 
 #### 3.3.1. waiting to lock a mutex more than allowed threshold ####
 
+  example code: <a href="test/fail-60.c">fail-60.c</a>
+  
+  lock try threshold is set to 1 seconds, and enabled terminating if waited more than threshold time. 
+
     # hthread_lock_try_threshold=1000 hthread_lock_try_threshold_assert=1 ./test/fail-60-debug 
     (hthread:23001) new thread created: 'root-process (0x1c240c0)'
     (hthread:23001)     at: (null) (null):0
@@ -372,6 +410,10 @@
 
 #### 3.3.2. hold a mutex lock more than allowed threshold ####
 
+  example code: <a href="test/fail-61.c">fail-61.c</a>
+  
+  lock hold threshold is set to 1 seconds, and enabled terminating if waited more than threshold time.
+   
     # hthread_lock_threshold=1000 hthread_lock_threshold_assert=1 ./test/fail-61-debug 
     (hthread:23772) new thread created: 'root-process (0xc3f0c0)'
     (hthread:23772)     at: (null) (null):0
