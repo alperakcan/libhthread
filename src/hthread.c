@@ -41,7 +41,7 @@ static pthread_mutex_t debugf_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
 #define hinfof(a...) { \
-	fprintf(stderr, "(hthread) "); \
+	fprintf(stderr, "(hthread:%d) ", getpid()); \
 	fprintf(stderr, a); \
 	fprintf(stderr, "\n"); \
 }

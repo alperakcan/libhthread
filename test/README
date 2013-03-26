@@ -1,6 +1,15 @@
 
+Unit tests behaviours and expected results
+==========================================
+
+  00-19: mutex tests
+  20-39: condition tests
+  40-59: thread tests
+  60-79: lock contention tests
+  80-99: race condition tests
+
                   success                                  fail
-    ====================================   ====================================
+    ------------------------------------   ------------------------------------
     
 00  init mutex                             destroy mutex
     destroy mutex                          ** invalid mutex **
@@ -24,7 +33,7 @@
     lock mutexes 0...n                     lock mutexes 0...n
     unlock mutexes 0...n                   unlock mutexes 0...n
     lock mutexes 0...n                     lock mutexes n...0
-    unlock mutexes 0...n                   ** lock order mismatch **
+    unlock mutexes 0...n                   ** lock order violation **
     destroy mutexes
 
 05  init mutex                             init mutex
@@ -104,7 +113,7 @@
     main  : create thread                  main  : create thread
     thread: lock mutex 0                   thread: lock mutex 1
     thread: lock mutex 1                   thread: lock mutex 0
-    thread: unlock mutex 0                 ** lock order violated **
+    thread: unlock mutex 0                 ** lock order violation **
     thread: unlock mutex 1
     main  : unlock mutex 0
     main  : unlock mutex 1
