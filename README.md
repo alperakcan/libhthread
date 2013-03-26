@@ -102,6 +102,22 @@
 
 ### 3.1 misuses of pthreads api ###
 
+  1. <a href="311-destroying-an-invalid-mutex">destroying an invalid mutex</a>
+  2. <a href="312-locking-an-invalid-mutex">locking an invalid mutex</a>
+  3. <a href="313-unlocking-an-invalid-mutex">unlocking an invalid mutex</a>
+  4. <a href="314-locking-an-already-locked-mutex">locking an already locked mutex</a>
+  5. <a href="315-unlocking-an-unheld-mutex">unlocking an unheld mutex</a>
+  6. <a href="316-destroying-a-locked-mutex">destroying a locked mutex</a>
+  7. <a href="317-destroying-an-invalid-condition">destroying an invalid condition</a>
+  8. <a href="318-signaling-an-invalid-condition">signaling an invalid condition</a>
+  9. <a href="319-broadcasting-an-invalid-condition">broadcasting an invalid condition</a>
+  10. <a href="3110-timedwaiting-on-an-invalid-condition">[timed]waiting on an invalid condition</a>
+  11. <a href="3111-timedwaiting-on-an-invalid-mutex">[timed]waiting on an invalid mutex</a>
+  12. <a href="3112-timedwaiting-on-an-unheld-mutex">[timed]waiting on an unheld mutex</a>
+  13. <a href="3113-join-invalid-thread">join invalid thread</a>
+  14. <a href="3114-detach-invalid-thread">detach invalid thread</a>
+  15. <a href="3115-unlocking-mutex-that-was-held-by-other-thread">unlocking mutex that was held by other thread</a>
+
 #### 3.1.1. destroying an invalid mutex ####
 
   example code: <a href="test/fail-00.c">fail-00.c</a>
