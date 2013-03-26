@@ -17,8 +17,7 @@
 #include <pthread.h>
 #include <assert.h>
 
-#define HTHREAD_INTERNAL	1
-#define HTHREAD_DISABLE_YIELD	0
+#define HTHREAD_INTERNAL			1
 
 #include "hthread.h"
 #include "uthash.h"
@@ -139,7 +138,7 @@ static inline int hthread_del (struct hthread *thread, const char *command, cons
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 
 static inline int debug_mutex_add_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
-static inline int debug_mutex_dump_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line);
+static inline int debug_mutex_try_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
 static inline struct hthread_mutex_lock * debug_mutex_find_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line);
 static inline int debug_mutex_del_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_add (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
@@ -559,27 +558,12 @@ int HTHREAD_FUNCTION_NAME(mutex_destroy_actual) (struct hthread_mutex *mutex, co
 
 int HTHREAD_FUNCTION_NAME(mutex_lock_actual) (struct hthread_mutex *mutex, const char *func, const char *file, const int line)
 {
-	int r;
 	debug_mutex_add_lock(mutex, "mutex lock", func, file, line);
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
-	unsigned int t = 0;
-	while (1) {
-		r = pthread_mutex_trylock(&mutex->mutex);
-		if (r == 0) {
-			break;
-		}
-		usleep(20000);
-		t += 1;
-		if (t >= (1000000 / 20000) * 10) {
-			herrorf("still waiting for %s mutex @ (%s %s:%d)", mutex->name, func, file, line);
-			debug_mutex_dump_lock(mutex, func, file, line);
-			t = 0;
-		}
-	}
+	return debug_mutex_try_lock(mutex, "mutex lock", func, file, line);
 #else
-	r = pthread_mutex_lock(&mutex->mutex);
+	return pthread_mutex_lock(&mutex->mutex);
 #endif
-	return r;
 }
 
 int HTHREAD_FUNCTION_NAME(mutex_unlock_actual) (struct hthread_mutex *mutex, const char *func, const char *file, const int line)
@@ -721,6 +705,7 @@ struct hthread_mutex_lock {
 	const char *func;
 	const char *file;
 	int line;
+	unsigned long long timeval;
 	UT_hash_handle hh;
 };
 
@@ -751,6 +736,34 @@ struct hthread_mutex_order {
 static struct hthread_cond *debug_conds = NULL;
 static struct hthread_mutex *debug_mutexes = NULL;
 static struct hthread_mutex_order *debug_orders = NULL;
+
+static inline int debug_getenv_int (const char *name)
+{
+	int r;
+	const char *e;
+	if (name == NULL) {
+		return -1;
+	}
+	e = getenv(name);
+	if (e == NULL) {
+		return -1;
+	}
+	r = atoi(e);
+	return r;
+}
+
+static inline unsigned long long debug_getclock (void)
+{
+	long long tsec;
+	long long tusec;
+	struct timespec ts;
+	if (clock_gettime(CLOCK_MONOTONIC, &ts) < 0) {
+		return 0;
+	}
+	tsec = ((long long)ts.tv_sec) * 1000;
+	tusec = ((long long)ts.tv_nsec) / 1000 / 1000;
+	return tsec + tusec;
+}
 
 static inline int debug_mutex_add_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line)
 {
@@ -905,32 +918,103 @@ found_mt:
 	nmtl->func = func;
 	nmtl->file = file;
 	nmtl->line = line;
+	nmtl->timeval = debug_getclock();
 	HASH_ADD_PTR(th->locks, mutex, nmtl);
 	hdebugf("added lock mutex: %s @ %p, to thread: %s @ %p", mutex->name, mutex, th->name, th);
 	hthread_unlock();
 	return 0;
 }
 
-static inline int debug_mutex_dump_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line)
+static int debug_mutex_try_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line)
 {
+	int r;
+	unsigned int a;
+	unsigned int v;
+	unsigned int t;
 	struct hthread *th;
 	struct hthread *nth;
 	struct hthread_mutex *mt;
 	struct hthread_mutex_lock *mtl;
-	(void) func;
-	(void) file;
-	(void) line;
+	hthread_lock();
+	th = debug_thread_find_self(command);
+	if (th != NULL) {
+		goto found_th;
+	}
+	hassert((th != NULL) && "can not find self");
+	hthread_unlock();
+	return -1;
+found_th:
 	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
 	if (mt != NULL) {
 		goto found_mt;
 	}
-	hassertf("can not find mutex: %s in list", mutex->name);
+	hdebug_lock();
+	hinfof("%s with invalid mutex: '%p'", command, mutex);
+	hinfof("    by: %s (%p)", th->name, th);
+	hinfof("    at: %s %s:%d", func, file, line);
+	hdebug_unlock();
+	hassert((mt != NULL) && "invalid mutex");
+	hthread_unlock();
 	return -1;
 found_mt:
-	HASH_ITER(hh, hthreads, th, nth) {
-		HASH_FIND_PTR(th->locks, mutex, mtl);
-		if (mtl != NULL) {
-			herrorf("mutex: %s is already locked @ (%s %s:%d)", mutex->name, mtl->func, mtl->file, mtl->line);
+	hthread_unlock();
+	t = 0;
+	while (1) {
+		r = pthread_mutex_trylock(&mutex->mutex);
+		if (r == 0) {
+			break;
+		}
+		usleep(10000);
+		t += 1;
+		v = debug_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_NAME);
+		if (v == (unsigned int) -1) {
+			v = HTHREAD_LOCK_TRY_THRESHOLD;
+		}
+		a = debug_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_ASSERT_NAME);
+		if (a == (unsigned int) -1) {
+			a = HTHREAD_LOCK_TRY_THRESHOLD_ASSERT;
+		}
+		if (t >= ((v * 1000) / 10000) && (v != 0)) {
+			hthread_lock();
+			th = debug_thread_find_self(command);
+			if (th != NULL) {
+				goto found_th_;
+			}
+			hassert((th != NULL) && "can not find self");
+			hthread_unlock();
+			return -1;
+found_th_:
+			HASH_FIND_PTR(debug_mutexes, &mutex, mt);
+			if (mt != NULL) {
+				goto found_mt_;
+			}
+			hdebug_lock();
+			hinfof("%s with invalid mutex: '%p'", command, mutex);
+			hinfof("    by: %s (%p)", th->name, th);
+			hinfof("    at: %s %s:%d", func, file, line);
+			hdebug_unlock();
+			hassert((mt != NULL) && "invalid mutex");
+			hthread_unlock();
+			return -1;
+found_mt_:
+			hdebug_lock();
+			hinfof("%s still waiting for mutex: '%s (%p)'", command, mutex->name, mutex);
+			hinfof("    by: %s (%p)", th->name, th);
+			hinfof("    at: %s %s:%d", func, file, line);
+			HASH_ITER(hh, hthreads, th, nth) {
+				HASH_FIND_PTR(th->locks, mutex, mtl);
+				if (mtl != NULL) {
+					hinfof("  currently locked");
+					hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
+					hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
+				}
+			}
+			hinfof("  created '%s (%p)'", mutex->name, mutex);
+			hinfof("    at: %s %s:%d", mutex->func, mutex->file, mutex->line);
+			hdebug_unlock();
+			hassert((a == 0) && "mutex try lock threashold reached");
+			t = 0;
+			hthread_unlock();
 		}
 	}
 	return 0;
@@ -966,6 +1050,9 @@ static inline int debug_mutex_del_lock (struct hthread_mutex *mutex, const char 
 	struct hthread *th;
 	struct hthread_mutex *mt;
 	struct hthread_mutex_lock *mtl;
+	unsigned int v;
+	unsigned int a;
+	unsigned long long timeval;
 	hthread_lock();
 	th = debug_thread_find_self(command);
 	if (th != NULL) {
@@ -1019,12 +1106,32 @@ found_mt:
 	hthread_unlock();
 	return -1;
 found_lc:
-	HASH_FIND_PTR(th->locks, mutex, mtl);
-	if (mtl != NULL) {
-		HASH_DEL(th->locks, mtl);
-		hdebugf("deleted lock mutex: %s @ %p, from thread: %s @ %p", mutex->name, mutex, th->name, th);
-		free(mtl);
+	HASH_DEL(th->locks, mtl);
+	timeval = debug_getclock();
+	v = debug_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_NAME);
+	if (v == (unsigned int) -1) {
+		v = HTHREAD_LOCK_TRY_THRESHOLD;
 	}
+	a = debug_getenv_int(HTHREAD_LOCK_TRY_THRESHOLD_ASSERT_NAME);
+	if (a == (unsigned int) -1) {
+		a = HTHREAD_LOCK_TRY_THRESHOLD_ASSERT;
+	}
+	if ((mtl->timeval > timeval) ||
+	    (mtl->timeval + v) < timeval) {
+		hdebug_lock();
+		hinfof("%s with a mutex '%s (%p)' hold during %llu ms", command, mutex->name, mutex, timeval - mtl->timeval);
+		hinfof("    by: %s (%p)", th->name, th);
+		hinfof("    at: %s %s:%d", func, file, line);
+		hinfof("  lock observed");
+		hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
+		hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
+		hinfof("  created '%s (%p)'", mutex->name, mutex);
+		hinfof("    at: %s %s:%d", mutex->func, mutex->file, mutex->line);
+		hdebug_unlock();
+		hassert((a == 0) && "mutex try lock threashold reached");
+	}
+	hdebugf("deleted lock mutex: %s @ %p, from thread: %s @ %p", mutex->name, mutex, th->name, th);
+	free(mtl);
 	hthread_unlock();
 	return 0;
 }

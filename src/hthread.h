@@ -11,6 +11,20 @@
 #if !defined(HTHREAD_H)
 #define HTHREAD_H 1
 
+#define HTHREAD_DISABLE_YIELD			0
+
+#define HTHREAD_LOCK_THRESHOLD			10000
+#define HTHREAD_LOCK_THRESHOLD_NAME		"hthread_lock_threashold"
+
+#define HTHREAD_LOCK_THRESHOLD_ASSERT		0
+#define HTHREAD_LOCK_THRESHOLD_ASSERT_NAME	"hthread_lock_threashold_assert"
+
+#define HTHREAD_LOCK_TRY_THRESHOLD		10000
+#define HTHREAD_LOCK_TRY_THRESHOLD_NAME		"hthread_lock_try_threashold"
+
+#define HTHREAD_LOCK_TRY_THRESHOLD_ASSERT	0
+#define HTHREAD_LOCK_TRY_THRESHOLD_ASSERT_NAME	"hthread_lock_try_threashold_assert"
+
 struct hthread;
 struct hthread_cond;
 struct hthread_mutex;

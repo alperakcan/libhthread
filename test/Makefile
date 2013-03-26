@@ -3,7 +3,7 @@ tests-success-y = \
 	$(subst .c, , $(wildcard success-*.c))
 
 tests-fail-y = \
-	$(subst .c, , $(wildcard fail-*.c))
+	$(subst .c, , $(filter-out fail-env.c, $(wildcard fail-*.c)))
 
 target-y = \
 	${tests-success-y} \

@@ -119,4 +119,26 @@ Unit tests behaviours and expected results
     main  : unlock mutex 1
     main  : join thread
     main  : destroy mutex
-  
+
+60  hthread_lock_try_threashold = 1000     hthread_lock_try_threashold = 1000
+    hthread_lock_try_assert = 0            hthread_lock_try_assert = 1
+    main  : init mutex                     main  : init mutex
+    main  : lock mutex                     main  : lock mutex
+    main  : create thread                  main  : create thread
+    main  : sleep 3                        main  : sleep 3
+    thread: lock mutex                     thread: lock mutex
+    ** try lock threashold reached **      ** try lock threashold reached **
+    ** still waiting on mutex **           ** still waiting on mutex **
+    thread: unlock mutex                   ** assert requested **
+    main  : unlock mutex
+    main  : join thread
+    main  : destroy mutex
+
+61  hthread_lock_hreashold = 1000          hthread_lock_threashold = 1000
+    hthread_lock_assert = 0                hthread_lock_assert = 1
+    init mutex                             init mutex
+    lock mutex                             lock mutex
+    sleep 3                                sleep 3
+    unlock mutex                           unlock mutex
+    ** lock threashold reached **          ** lock threashold reached **         
+    destroy mutex                          ** assert requested **
