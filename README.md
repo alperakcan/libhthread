@@ -35,6 +35,12 @@
 
 ### 1.2 lock ordering violation ###
 
+  hthread is able to detect inconsistent locking orders, it is very useful because they usually result to deadlocks. they may never
+  be discovered during testing and lead to hard-to-find bugs.
+  
+  hthread monitors locks/unlocks and stores them in separate tables for each thread. this allows hthread to build a global lock order
+  table for running process.
+
   - lock order violation in same thread - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-04.c">fail-04.c</a>
   - lock order violation while [timed]waiting on condition - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-26.c">fail-26.c</a>
   - lock order violation between threads - <a href="https://github.com/anhanguera/libhthread/blob/master/test/fail-43.c">fail-43.c</a>
