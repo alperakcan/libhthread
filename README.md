@@ -46,6 +46,12 @@
 
 ## 2. configuration ##
 
+  - hthread_lock_hreashold (default 10 seconds)
+  - hthread_lock_hreashold_assert (default no)
+  
+  - hthread_lock_try_threshold (default 10 seconds)
+  - hthread_lock_try_threshold_assert (default no)
+
 ## 3. license ##
 
   Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>

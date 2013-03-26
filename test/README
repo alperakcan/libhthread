@@ -120,8 +120,8 @@ Unit tests behaviours and expected results
     main  : join thread
     main  : destroy mutex
 
-60  hthread_lock_try_threshold = 1000     hthread_lock_try_threshold = 1000
-    hthread_lock_try_assert = 0            hthread_lock_try_assert = 1
+60  hthread_lock_try_threshold = 1000      hthread_lock_try_threshold = 1000
+    hthread_lock_try_threshold_assert = 0  hthread_lock_try_threshold_assert = 1
     main  : init mutex                     main  : init mutex
     main  : lock mutex                     main  : lock mutex
     main  : create thread                  main  : create thread
