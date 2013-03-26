@@ -22,7 +22,7 @@
   hthread is able to detect and report following errors. although some of them are too obvious, early detection is much better
   than to deal with hard-to-find bugs.
   
-  1. destroying an invalid mutex - <a href="test/fail-00.c">fail-00.c</a>
+  1. destroying an invalid mutex - <a href="test/fail-00.c">fail-00.c</a>, <a href="#311-destroying-an-invalid-mutex">report</a>
   2. locking an invalid mutex - <a href="test/fail-01.c">fail-01.c</a>
   3. unlocking an invalid mutex - <a href="test/fail-02.c">fail-02.c</a>
   4. locking an already locked mutex - <a href="test/fail-03.c">fail-03.c</a>
