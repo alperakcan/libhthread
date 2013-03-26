@@ -101,6 +101,7 @@
 
 #### 3.1.1. destroying an invalid mutex ####
 
+	``` c
 	/*
 	 *  Copyright (c) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
 	 *
@@ -130,7 +131,7 @@
 		}
 		return 0;
 	}
-	
+	```
 
     # ./test/fail-00-debug 
     (hthread:22594) new thread created: 'root-process (0x2179010)'
