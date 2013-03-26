@@ -47,9 +47,9 @@
   table for running process. hthread check for locking order violation against global order table for each lock request, and able to
   detect and report following errors.
 
-  1. lock order violation in same thread - <a href="test/fail-04.c">fail-04.c</a>
-  2. lock order violation while [timed]waiting on condition - <a href="test/fail-26.c">fail-26.c</a>
-  3. lock order violation between threads - <a href="test/fail-43.c">fail-43.c</a>
+  1. lock order violation in same thread - <a href="test/fail-04.c">fail-04.c</a>, <a href="#321-lock-order-violation-in-same-thread">report</a>
+  2. lock order violation while [timed]waiting on condition - <a href="test/fail-26.c">fail-26.c</a>, <a href="#322-lock-order-violation-while-timedwaiting-on-condition">report</a>
+  3. lock order violation between threads - <a href="test/fail-43.c">fail-43.c</a>, <a href="#323-lock-order-violation-between-threads">report</a>
 
 ### 1.3 lock contention ###
 
@@ -57,8 +57,8 @@
   lock contentions is handy because, they usually cause unwanted delays or they may point to an undetected potential deadlock. hthread
   can report followings.
 
-  1. waiting to lock a mutex more than allowed threshold - <a href="test/fail-60.c">fail-60.c</a>
-  2. hold a mutex lock more than allowed threshold - <a href="test/fail-61.c">fail-61.c</a>
+  1. waiting to lock a mutex more than allowed threshold - <a href="test/fail-60.c">fail-60.c</a>, <a href="#331-waiting-to-lock-a-mutex-more-than-allowed-threshold">report</a>
+  2. hold a mutex lock more than allowed threshold - <a href="test/fail-61.c">fail-61.c</a>, <a href="#332-hold-a-mutex-lock-more-than-allowed-threshold">report</a>
 
 ## 2. configuration ##
 
