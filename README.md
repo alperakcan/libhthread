@@ -981,18 +981,15 @@
 
 ## 5. usage example ##
 
-  using hthread is pretty simple, just clone libhthread and build,
-  
-  - add <tt>-include hthread.h -DHTHREAD_DEBUG=1 -g -O1</tt> to target cflags
-  - and link with <tt>-lhthread -lrt</tt> if HTHREAD_ENABLE_CALLSTACK is 0
-  - and link with <tt>-lhthread -lrt -ldl -lbfd</tt> if HTHREAD_ENABLE_CALLSTACK is 1
-
+  using hthread is pretty simple, just clone libhthread and build, add <tt>-include hthread.h -DHTHREAD_DEBUG=1 -g -O1</tt>
+  to target cflags and link with <tt>-lhthread -lrt</tt> if HTHREAD_ENABLE_CALLSTACK is 0 or link with
+  <tt>-lhthread -lrt -ldl -lbfd</tt> if HTHREAD_ENABLE_CALLSTACK is 1
 
   compile libhthread
 
-    git clone git://github.com/anhanguera/libhthread.git
-    cd libhthread
-    make
+    # git clone git://github.com/anhanguera/libhthread.git
+    # cd libhthread
+    # make
   
   let below is the source code - with double lock error - to be monitored:
   
