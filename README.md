@@ -986,7 +986,7 @@
   - add <tt>-include hthread.h -DHTHREAD_DEBUG=1 -g -O1</tt> to target cflags
   - and link with <tt>-lhthread -lrt</tt> if HTHREAD_ENABLE_CALLSTACK is 0
   - and link with <tt>-lhthread -lrt -ldl -lbfd</tt> if HTHREAD_ENABLE_CALLSTACK is 1
-  
+ 
     # git clone git://github.com/anhanguera/libhthread.git
     # cd libhthread
     # make
