@@ -193,8 +193,8 @@ struct hthread_mutex;
 
 #endif
 
-#define hthread_self()                        HTHREAD_FUNCTION_NAME(self_actual)(, __FUNCTION__, __FILE__, __LINE__)
-#define hthread_sched_yield()                 HTHREAD_FUNCTION_NAME(sched_yield_actual)(, __FUNCTION__, __FILE__, __LINE__)
+#define hthread_self()                        HTHREAD_FUNCTION_NAME(self_actual)(__FUNCTION__, __FILE__, __LINE__)
+#define hthread_sched_yield()                 HTHREAD_FUNCTION_NAME(sched_yield_actual)(__FUNCTION__, __FILE__, __LINE__)
 
 #define hthread_create(a, b, c)               HTHREAD_FUNCTION_NAME(create_actual)(a, b, c, __FUNCTION__, __FILE__, __LINE__)
 #define hthread_detach(a)                     HTHREAD_FUNCTION_NAME(detach_actual)(a, __FUNCTION__, __FILE__, __LINE__)
