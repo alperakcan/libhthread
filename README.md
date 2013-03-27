@@ -65,7 +65,62 @@
 
 ## 2. configuration ##
 
-### 2.1 runtime options ###
+  1. <a href="">compile-time options</a>
+  2. <a href="">run-time options</a>
+
+### 2.1 compile-time options ###
+
+  - HTHREAD_ENABLE_CALLSTACK
+  
+  
+    default yes
+    
+    enable/disable reporting call trace information on error, useful but depends on <tt>libbdf</tt>, <tt>libdl</tt>, and <tt>backtrace function from glibc</tt>.
+    may be disabled for toolchains which does not support backtracing.
+  
+  - HTHREAD_REPORT_CALLSTACK
+  
+  
+    default yes
+    
+    dump callstack info (function call history) for error point.
+  
+  - HTHREAD_ASSERT_ON_ERROR
+  
+    
+    default yes
+    
+    terminate the process on any pthreads api misuse and/or lock order violation.
+  
+  - HTHREAD_LOCK_THRESHOLD
+  
+    
+    default 5000 miliseconds
+    
+    print report if lock is held longer than the specified time, in miliseconds.
+  
+  - HTHREAD_LOCK_THRESHOLD_ASSERT
+  
+    
+    default no
+    
+    terminate if lock is held longer than the specified time, in miliseconds.
+  
+  - HTHREAD_LOCK_TRY_THRESHOLD
+  
+    
+    default 5000 miliseconds
+    
+    print report if locking operation takes longer than the specified time, in miliseconds.
+  
+  - HTHREAD_LOCK_TRY_THRESHOLD_ASSERT
+  
+    
+    default no
+    
+    terminate if locking operation takes longer than the specified time, in miliseconds.
+ 
+### 2.2 runt-ime options ###
   
   hthread reads configuration parameters from environment via getenv function call. one can either set/change environment variables in source
   code of monitored project via setenv function call, or set them globally in running shell using export function.
