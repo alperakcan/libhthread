@@ -19,8 +19,10 @@
 #if defined(__DARWIN__) && (__DARWIN__ == 1)
 #include <mach/mach_time.h>
 #endif
+#include <execinfo.h>
 
 #define HTHREAD_INTERNAL			1
+#define HTHREAD_CALLSTACK_MAX			128
 
 #include "hthread.h"
 #include "uthash.h"
@@ -103,6 +105,8 @@ struct hthread {
 	const char *func;
 	const char *file;
 	int line;
+	int frames;
+	void *callstack[HTHREAD_CALLSTACK_MAX];
         char name[0];
 #endif
 };
@@ -149,6 +153,7 @@ static inline int hthread_del (struct hthread *thread, const char *command, cons
 
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 
+static inline int debug_dump_callstack (const char *prefix);
 static inline int debug_memory_add (const char *name, void *address, size_t size, const char *command, const char *func, const char *file, const int line);
 static inline int debug_memory_del (void *address, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_add_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
@@ -342,6 +347,7 @@ found_sth:
 	hinfof("%s with invalid thread: '%p'", command, thread);
 	hinfof("    by: %s (%p)", sth->name, sth);
 	hinfof("    at: %s %s:%d", func, file, line);
+	debug_dump_callstack("        ");
 	hdebug_unlock();
 #else
 	(void) func;
@@ -898,6 +904,21 @@ static inline unsigned long long debug_getclock (void)
 	return _clock;
 }
 
+static inline int debug_dump_callstack (const char *prefix)
+{
+	int i;
+	int frames;
+	char **strs;
+	void *callstack[HTHREAD_CALLSTACK_MAX];
+	frames = backtrace(callstack, HTHREAD_CALLSTACK_MAX);
+	strs = backtrace_symbols(callstack, frames);
+	for (i = 0; i < frames; i++) {
+		hinfof("%s%s", prefix, strs[i]);
+	}
+	free(strs);
+	return 0;
+}
+
 static inline int debug_mutex_add_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
@@ -927,6 +948,7 @@ found_th:
 	hinfof("%s with invalid mutex: '%p'", command, mutex);
 	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	debug_dump_callstack("        ");
 	hdebug_unlock();
 	hassert((mt != NULL) && "invalid mutex");
 	hthread_unlock();
@@ -938,6 +960,7 @@ found_mt:
 		hinfof("%s with already held mutex: '%s (%p)'", command, mutex->name, mutex);
 		hinfof("    by: %s (%p)", th->name, th);
 		hinfof("    at: %s %s:%d", func, file, line);
+		debug_dump_callstack("        ");
 		hinfof("  previously acquired");
 		hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
 		hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
@@ -1005,6 +1028,7 @@ found_mt:
 			hinfof("    followed by a later acquisition of '%s (%p)'", mutex->name, mutex);
 			hinfof("      by: %s (%p)", th->name, th);
 			hinfof("      at: %s %s:%d", func, file, line);
+			debug_dump_callstack("          ");
 			hinfof("  required order is: acquisition of '%s (%p)'", mto->key.first->name, mto->key.first);
 			hinfof("      by: %s (%p)", mto->info.first.thread->name, mto->info.first.thread);
 			hinfof("      at: %s %s:%d", mto->info.first.func, mto->info.first.file, mto->info.first.line);
@@ -1134,6 +1158,7 @@ found_mt_:
 			hinfof("%s still waiting for mutex: '%s (%p)'", command, mutex->name, mutex);
 			hinfof("    by: %s (%p)", th->name, th);
 			hinfof("    at: %s %s:%d", func, file, line);
+			debug_dump_callstack("        ");
 			HASH_ITER(hh, hthreads, th, nth) {
 				HASH_FIND_PTR(th->locks, mutex, mtl);
 				if (mtl != NULL) {
@@ -1203,6 +1228,7 @@ found_th:
 	hinfof("%s with invalid mutex '%p'", command, mutex);
 	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	debug_dump_callstack("        ");
 	hdebug_unlock();
 	hassert((mt != NULL) && "invalid mutex");
 	hthread_unlock();
@@ -1218,6 +1244,7 @@ found_mt:
 		hinfof("%s with a mutex '%s (%p)' currently hold by other thread", command, mutex->name, mutex);
 		hinfof("    by: %s (%p)", th->name, th);
 		hinfof("    at: %s %s:%d", func, file, line);
+		debug_dump_callstack("        ");
 		hinfof("  lock observed");
 		hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
 		hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
@@ -1232,6 +1259,7 @@ found_mt:
 	hinfof("%s with unheld mutex: '%s (%p)'", command, mutex->name, mutex);
 	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	debug_dump_callstack("        ");
 	hinfof("  created '%s (%p)'", mutex->name, mutex);
 	hinfof("    at: %s %s:%d", mutex->func, mutex->file, mutex->line);
 	hdebug_unlock();
@@ -1255,6 +1283,7 @@ found_lc:
 		hinfof("%s with a mutex '%s (%p)' hold during %llu ms", command, mutex->name, mutex, timeval - mtl->timeval);
 		hinfof("    by: %s (%p)", th->name, th);
 		hinfof("    at: %s %s:%d", func, file, line);
+		debug_dump_callstack("        ");
 		hinfof("  lock observed");
 		hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
 		hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
@@ -1322,6 +1351,7 @@ found_th:
 	hinfof("%s with invalid mutex: '%p'", command, mutex);
 	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	debug_dump_callstack("        ");
 	hdebug_unlock();
 	hassert((mt != NULL) && "invalid mutex");
 	hthread_unlock();
@@ -1333,6 +1363,7 @@ found_mt:
 		hinfof("%s with currently locked mutex: '%p'", command, mutex);
 		hinfof("    by: %s (%p)", th->name, th);
 		hinfof("    at: %s %s:%d", func, file, line);
+		debug_dump_callstack("        ");
 		hinfof("  lock observed");
 		hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
 		hinfof("    at: %s %s:%d", mtl->func, mtl->file, mtl->line);
@@ -1407,6 +1438,7 @@ found_th:
 	hinfof("%s with invalid condition: '%p'", command, cond);
 	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	debug_dump_callstack("        ");
 	hdebug_unlock();
 	hassert((cv != NULL) && "invalid condition");
 	hthread_unlock();
@@ -1439,6 +1471,7 @@ found_th:
 	hinfof("%s with invalid condition: '%p'", command, cond);
 	hinfof("    by: %s (%p)", th->name, th);
 	hinfof("    at: %s %s:%d", func, file, line);
+	debug_dump_callstack("        ");
 	hdebug_unlock();
 	hassert((cv != NULL) && "invalid condition");
 	hthread_unlock();
