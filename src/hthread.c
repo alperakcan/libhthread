@@ -792,7 +792,7 @@ static inline unsigned long long debug_getclock (void)
 	}
 	tsec = ((unsigned long long) ts.tv_sec) * 1000;
 	tusec = ((unsigned long long) ts.tv_nsec) / 1000 / 1000;
-	_clock = tsec + tused;
+	_clock = tsec + tusec;
 #else
 	#error "unknown os"
 #endif
