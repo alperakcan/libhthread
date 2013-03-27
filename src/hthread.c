@@ -30,7 +30,7 @@ static pthread_mutex_t debugf_mutex = PTHREAD_MUTEX_INITIALIZER;
 #define hdebug_lock() pthread_mutex_lock(&debugf_mutex);
 #define hdebug_unlock() pthread_mutex_unlock(&debugf_mutex);
 
-#if 0
+#if 1
 #define hdebugf(a...) { \
 	hdebug_lock(); \
 	fprintf(stderr, "hthread::debug: "); \
@@ -741,6 +741,32 @@ int HTHREAD_FUNCTION_NAME(sched_yield_actual) (const char *func, const char *fil
 }
 
 
+char * HTHREAD_FUNCTION_NAME(strdup_actual) (const char *name, const char *string, const char *func, const char *file, const int line)
+{
+	void *rc;
+	if (string == NULL) {
+		hinfof("strdup with invalid argument '%p'", string);
+		hinfof("    at: %s %s:%d", func, file, line);
+		return NULL;
+	}
+	rc = strdup(string);
+	debug_memory_add(name, rc, strlen(rc) + 1, "strdup", func, file, line);
+	return rc;
+}
+
+char * HTHREAD_FUNCTION_NAME(strndup_actual) (const char *name, const char *string, size_t size, const char *func, const char *file, const int line)
+{
+	void *rc;
+	if (string == NULL) {
+		hinfof("strdup with invalid argument '%p'", string);
+		hinfof("    at: %s %s:%d", func, file, line);
+		return NULL;
+	}
+	rc = strndup(string, size);
+	debug_memory_add(name, rc, strlen(rc) + 1, "strndup", func, file, line);
+	return rc;
+}
+
 void * HTHREAD_FUNCTION_NAME(malloc_actual) (const char *name, size_t size, const char *func, const char *file, const int line)
 {
 	void *rc;
@@ -1404,9 +1430,20 @@ static int debug_memory_add (const char *name, void *address, size_t size, const
 	if (m != NULL) {
 		hdebug_lock();
 		hinfof("%s with invalid memory (%p)", command, address);
-		hinfof("    at: %s (%s:%d)\n", func, file, line);
-		hinfof("  please close race condition checking, and inform author");
-		hinfof("  at alper.akcan@gmail.com");
+		hinfof("    at: %s (%s:%d)", func, file, line);
+		hinfof("  ");
+		hinfof("  it is essential for correct operation of hthread that there");
+		hinfof("  are no memory errors such as dangling pointers in process.");
+		hinfof("  ");
+		hinfof("  which means that it is a good idea to make sure that program");
+		hinfof("  is clean before analyzing with hthread. it is possible however");
+		hinfof("  that some memory errors are caused by data races.")
+		hinfof("  ");
+		hinfof("  if it is certain that program is memory bug free, then hthread");
+		hinfof("  may have a serious bug that needs to be fixed urgent. please close");
+		hinfof("  race condition checking for now '-DHTHREAD_ENABLE_RACE_CHECK=0',");
+		hinfof("  and inform author");
+		hinfof("    at: alper.akcan@gmail.com");
 		hdebug_unlock();
 		hassert((m == NULL) && "invalid memory");
 		hthread_unlock();
@@ -1418,8 +1455,11 @@ static int debug_memory_add (const char *name, void *address, size_t size, const
 	memcpy(m->name, name, strlen(name) + 1);
 	m->address = address;
 	m->size = size;
+	m->func = func;
+	m->file = file;
+	m->line = line;
 	HASH_ADD_PTR(debug_memory, address, m);
-	hdebugf("%s added memory at %p", command, m->address);
+	hdebugf("%s added memory: %s, address: %p, size: %zd, func: %s, file: %s, line: %d", command, m->name, m->address, m->size, m->func, m->file, m->line);
 	hthread_unlock();
 	return 0;
 }
@@ -1438,7 +1478,18 @@ static int debug_memory_del (void *address, const char *command, const char *fun
 	hdebug_lock();
 	hinfof("%s with invalid memory (%p)", command, address);
 	hinfof("    at: %s (%s:%d)", func, file, line);
-	hinfof("  please close race condition checking, and inform author");
+	hinfof("  ");
+	hinfof("  it is essential for correct operation of hthread that there");
+	hinfof("  are no memory errors such as dangling pointers in process.");
+	hinfof("  ");
+	hinfof("  which means that it is a good idea to make sure that program");
+	hinfof("  is clean before analyzing with hthread. it is possible however");
+	hinfof("  that some memory errors are caused by data races.")
+	hinfof("  ");
+	hinfof("  if it is certain that program is memory bug free, then hthread");
+	hinfof("  may have a serious bug that needs to be fixed urgent. please close");
+	hinfof("  race condition checking for now '-DHTHREAD_ENABLE_RACE_CHECK=0',");
+	hinfof("  and inform author");
 	hinfof("    at: alper.akcan@gmail.com");
 	hdebug_unlock();
 	hassert((m != NULL) && "invalid memory");
@@ -1446,7 +1497,8 @@ static int debug_memory_del (void *address, const char *command, const char *fun
 	return -1;
 found_m:
 	HASH_DEL(debug_memory, m);
-	hdebugf("%s deleted memory at %p", command, address);
+	hdebugf("%s deleted memory: %s, address: %p, size: %zd, func: %s, file: %s, line: %d", command, m->name, m->address, m->size, m->func, m->file, m->line);
+	free(m);
 	hthread_unlock();
 	return 0;
 }

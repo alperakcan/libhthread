@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main (int argc, char *argv[])
 {
@@ -42,6 +43,18 @@ int main (int argc, char *argv[])
 	rc = realloc(rc, 2048);
 	if (rc == NULL) {
 		fprintf(stderr, "realloc failed\n");
+		exit(-1);
+	}
+	free(rc + 10);
+	rc = strdup(argv[0]);
+	if (rc == NULL) {
+		fprintf(stderr, "strdup failed\n");
+		exit(-1);
+	}
+	free(rc + 10);
+	rc = strndup(argv[0], 1024);
+	if (rc == NULL) {
+		fprintf(stderr, "strdup failed\n");
 		exit(-1);
 	}
 	free(rc + 10);
