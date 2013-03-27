@@ -1,5 +1,9 @@
 
+ifeq ($(uname_S), Linux)
 HTHREAD_ENABLE_CALLSTACK ?= y
+else
+HTHREAD_ENABLE_CALLSTACK := n
+endif
 
 tests-success-y = \
 	$(subst .c, , $(wildcard success-*.c))
@@ -25,7 +29,7 @@ define test-defaults
 	$1_ldflags-y = \
 		-lpthread
 	
-ifeq ($(uname_S),Linux)
+ifeq ($(uname_S), Linux)
 	$1_ldflags-y += \
 		-lrt
 endif
@@ -51,7 +55,7 @@ define test-debug-defaults
 		-ldl \
 		-lbfd
 	
-ifeq ($(uname_S),Linux)
+ifeq ($(uname_S), Linux)
 	$1_ldflags-y += \
 		-lrt
 endif

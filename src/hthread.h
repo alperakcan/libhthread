@@ -19,6 +19,11 @@
 #define HTHREAD_ENABLE_CALLSTACK		1
 #endif
 
+#if defined(__DARWIN__) && (__DARWIN__ == 1)
+#undef HTHREAD_ENABLE_CALLSTACK
+#define HTHREAD_ENABLE_CALLSTACK		0
+#endif
+
 #if !defined(HTHREAD_REPORT_CALLSTACK)
 #define HTHREAD_REPORT_CALLSTACK		1
 #endif
