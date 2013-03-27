@@ -72,7 +72,6 @@
   
   	
   	default yes
-  	
   	dump callstack info (function call history) for error point.
   
   - hthread_assert_on_error
