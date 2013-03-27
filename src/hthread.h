@@ -37,8 +37,41 @@ struct hthread_mutex;
 #if !defined(HTHREAD_INTERNAL) || (HTHREAD_INTERNAL == 0)
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
 #include <errno.h>
+
+#if defined(HTHREAD_ENABLE_RACE_CHECK) && (HTHREAD_ENABLE_RACE_CHECK == 1)
+
+#define malloc(size) ({ \
+	void *__r; \
+	char __n[256]; \
+	snprintf(__n, 256, "malloc-%d@(%s %s:%d)", size, __FUNCTION__, __FILE__, __LINE__); \
+	__r = hthread_malloc((const char *) __n, size); \
+	__r; \
+})
+
+#define calloc(nmemb, size) ({ \
+	void *__r; \
+	char __n[256]; \
+	snprintf(__n, 256, "calloc-%d,%ds@(%s %s:%d)", nmemb, size, __FUNCTION__, __FILE__, __LINE__); \
+	__r = hthread_calloc((const char *) __n, nmemb, size); \
+	__r; \
+})
+
+#define realloc(address, size) ({ \
+	void *__r; \
+	char __n[256]; \
+	snprintf(__n, 256, "realloc-%ds@(%s %s:%d)", size, __FUNCTION__, __FILE__, __LINE__); \
+	__r = hthread_realloc((const char *) __n, address, size); \
+	__r; \
+})
+
+#define free(address) ({ \
+	hthread_free(address); \
+})
+
+#endif
 
 #define pthread_t struct hthread *
 
@@ -193,8 +226,13 @@ struct hthread_mutex;
 
 #endif
 
-#define hthread_self()                        HTHREAD_FUNCTION_NAME(self_actual)(, __FUNCTION__, __FILE__, __LINE__)
-#define hthread_sched_yield()                 HTHREAD_FUNCTION_NAME(sched_yield_actual)(, __FUNCTION__, __FILE__, __LINE__)
+#define hthread_malloc(a, b)                  HTHREAD_FUNCTION_NAME(malloc_actual)(a, b, __FUNCTION__, __FILE__, __LINE__)
+#define hthread_calloc(a, b, c)               HTHREAD_FUNCTION_NAME(calloc_actual)(a, b, c, __FUNCTION__, __FILE__, __LINE__)
+#define hthread_realloc(a, b, c)               HTHREAD_FUNCTION_NAME(realloc_actual)(a, b, c, __FUNCTION__, __FILE__, __LINE__)
+#define hthread_free(a)                       HTHREAD_FUNCTION_NAME(free_actual)(a, __FUNCTION__, __FILE__, __LINE__)
+
+#define hthread_self()                        HTHREAD_FUNCTION_NAME(self_actual)(__FUNCTION__, __FILE__, __LINE__)
+#define hthread_sched_yield()                 HTHREAD_FUNCTION_NAME(sched_yield_actual)(__FUNCTION__, __FILE__, __LINE__)
 
 #define hthread_create(a, b, c)               HTHREAD_FUNCTION_NAME(create_actual)(a, b, c, __FUNCTION__, __FILE__, __LINE__)
 #define hthread_detach(a)                     HTHREAD_FUNCTION_NAME(detach_actual)(a, __FUNCTION__, __FILE__, __LINE__)
@@ -212,6 +250,11 @@ struct hthread_mutex;
 #define hthread_cond_signal(a)                HTHREAD_FUNCTION_NAME(cond_signal_actual)(a, __FUNCTION__, __FILE__, __LINE__)
 #define hthread_cond_broadcast(a)             HTHREAD_FUNCTION_NAME(cond_broadcast_actual)(a, __FUNCTION__, __FILE__, __LINE__)
 #define hthread_cond_destroy(a)               HTHREAD_FUNCTION_NAME(cond_destroy_actual)(a, __FUNCTION__, __FILE__, __LINE__)
+
+void * HTHREAD_FUNCTION_NAME(malloc_actual) (const char *name, size_t size, const char *func, const char *file, const int line);
+void * HTHREAD_FUNCTION_NAME(calloc_actual) (const char *name, size_t nmemb, size_t size, const char *func, const char *file, const int line);
+void * HTHREAD_FUNCTION_NAME(realloc_actual) (const char *name, void *address, size_t size, const char *func, const char *file, const int line);
+void HTHREAD_FUNCTION_NAME(free_actual) (void *address, const char *func, const char *file, const int line);
 
 struct hthread * HTHREAD_FUNCTION_NAME(self_actual) (const char *func, const char *file, const int line);
 int HTHREAD_FUNCTION_NAME(sched_yield_actual) (const char *func, const char *file, const int line);

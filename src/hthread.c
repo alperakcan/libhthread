@@ -132,6 +132,18 @@ struct hthread_mutex {
 #endif
 };
 
+struct hthread_memory {
+	void *address;
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
+	UT_hash_handle hh;
+	const char *func;
+	const char *file;
+	int line;
+	size_t size;
+	char name[0];
+#endif
+};
+
 #define hthread_lock()   pthread_mutex_lock(&hthread_mutex)
 #define hthread_unlock() pthread_mutex_unlock(&hthread_mutex)
 #define hthread_self_pthread()   pthread_self()
@@ -146,6 +158,8 @@ static inline int hthread_del (struct hthread *thread, const char *command, cons
 
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 
+static inline int debug_memory_add (const char *name, void *address, size_t size, const char *command, const char *func, const char *file, const int line);
+static inline int debug_memory_del (void *address, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_add_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
 static inline int debug_mutex_try_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line);
 static inline struct hthread_mutex_lock * debug_mutex_find_lock (struct hthread_mutex *mutex, const char *func, const char *file, const int line);
@@ -161,6 +175,8 @@ static inline int debug_cond_check (struct hthread_cond *mutex, const char *comm
 	(void) func; \
 	(void) file; \
 	(void) line;
+#define debug_memory_add(a...)		(void) name; debug_thread_unused()
+#define debug_memory_del(a...)		debug_thread_unused()
 #define debug_mutex_add_lock(a...)	debug_thread_unused()
 #define debug_mutex_del_lock(a...)	debug_thread_unused()
 #define debug_mutex_add(a...)		debug_thread_unused()
@@ -719,6 +735,41 @@ int HTHREAD_FUNCTION_NAME(sched_yield_actual) (const char *func, const char *fil
 #else
 	return sched_yield();
 #endif
+}
+
+
+void * HTHREAD_FUNCTION_NAME(malloc_actual) (const char *name, size_t size, const char *func, const char *file, const int line)
+{
+	void *rc;
+	rc = malloc(size);
+	debug_memory_add(name, rc, size, "malloc", func, file, line);
+	return rc;
+}
+
+void * HTHREAD_FUNCTION_NAME(calloc_actual) (const char *name, size_t nmemb, size_t size, const char *func, const char *file, const int line)
+{
+	void *rc;
+	rc = calloc(nmemb, size);
+	debug_memory_add(name, rc, nmemb * size, "calloc", func, file, line);
+	return rc;
+}
+
+void * HTHREAD_FUNCTION_NAME(realloc_actual) (const char *name, void *address, size_t size, const char *func, const char *file, const int line)
+{
+	void *rc;
+	rc = realloc(address, size);
+	if (rc == NULL) {
+		return rc;
+	}
+	debug_memory_del(address, "realloc", func, file, line);
+	debug_memory_add(name, rc, size, "realloc", func, file, line);
+	return rc;
+}
+
+void HTHREAD_FUNCTION_NAME(free_actual) (void *address, const char *func, const char *file, const int line)
+{
+	debug_memory_del(address, "free", func, file, line);
+	free(address);
 }
 
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
@@ -1320,6 +1371,67 @@ found_th:
 	hthread_unlock();
 	return -1;
 found_cv:
+	hthread_unlock();
+	return 0;
+}
+
+static struct hthread_memory *debug_memory = NULL;
+
+static int debug_memory_add (const char *name, void *address, size_t size, const char *command, const char *func, const char *file, const int line)
+{
+	unsigned int s;
+	struct hthread_memory *m;
+	if (address == NULL) {
+		return 0;
+	}
+	hthread_lock();
+	HASH_FIND_PTR(debug_memory, &address, m);
+	if (m != NULL) {
+		hdebug_lock();
+		hinfof("%s with invalid memory (%p)", command, address);
+		hinfof("    at: %s (%s:%d)\n", func, file, line);
+		hinfof("  please close race condition checking, and inform author");
+		hinfof("  at alper.akcan@gmail.com");
+		hdebug_unlock();
+		hassert((m == NULL) && "invalid memory");
+		hthread_unlock();
+		return -1;
+	}
+	s = sizeof(struct hthread_memory) + strlen(name) + 1;
+	m = malloc(s);
+	memset(m, 0, s);
+	memcpy(m->name, name, strlen(name) + 1);
+	m->address = address;
+	m->size = size;
+	HASH_ADD_PTR(debug_memory, address, m);
+	hdebugf("%s added memory at %p", command, m->address);
+	hthread_unlock();
+	return 0;
+}
+
+static int debug_memory_del (void *address, const char *command, const char *func, const char *file, const int line)
+{
+	struct hthread_memory *m;
+	if (address == NULL) {
+		return 0;
+	}
+	hthread_lock();
+	HASH_FIND_PTR(debug_memory, &address, m);
+	if (m != NULL) {
+		goto found_m;
+	}
+	hdebug_lock();
+	hinfof("%s with invalid memory (%p)", command, address);
+	hinfof("    at: %s (%s:%d)", func, file, line);
+	hinfof("  please close race condition checking, and inform author");
+	hinfof("    at: alper.akcan@gmail.com");
+	hdebug_unlock();
+	hassert((m != NULL) && "invalid memory");
+	hthread_unlock();
+	return -1;
+found_m:
+	HASH_DEL(debug_memory, m);
+	hdebugf("%s deleted memory at %p", command, address);
 	hthread_unlock();
 	return 0;
 }

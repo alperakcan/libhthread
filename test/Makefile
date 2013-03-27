@@ -37,6 +37,7 @@ define test-debug-defaults
 
 	$1_cflags-y = \
 		-DHTHREAD_DEBUG=1 \
+		-DHTHREAD_ENABLE_RACE_CHECK=1 \
 		-include ../src/hthread.h
 	
 	$1_includes-y = \
