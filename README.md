@@ -896,7 +896,11 @@
 
 ## 5. usage example ##
 
-  using hthread is pretty simple, just add <tt>-include hthread.h -DHTHREAD_DEBUG=1</tt> to cflags, and link with <tt>-lhthread -lrt</tt>
+  using hthread is pretty simple, just clone lbhthread and build, add <tt>-include hthread.h -DHTHREAD_DEBUG=1</tt> to target cflags, and link with <tt>-lhthread -lrt</tt>
+  
+    # git clone git://github.com/anhanguera/libhthread.git
+    # cd libhthread
+    # make
   
   let below is the source code - with double lock error - to be monitored:
   
