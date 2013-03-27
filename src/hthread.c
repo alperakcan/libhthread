@@ -19,9 +19,11 @@
 #if defined(__DARWIN__) && (__DARWIN__ == 1)
 #include <mach/mach_time.h>
 #endif
+#if defined(HTHREAD_ENABLE_CALLSTACK) && (HTHREAD_ENABLE_CALLSTACK == 1)
 #include <bfd.h>
 #include <dlfcn.h>
 #include <execinfo.h>
+#endif
 
 #define HTHREAD_INTERNAL			1
 #define HTHREAD_CALLSTACK_MAX			128

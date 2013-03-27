@@ -985,11 +985,17 @@
   to target cflags and link with <tt>-lhthread -lrt</tt> if HTHREAD_ENABLE_CALLSTACK is 0 or link with
   <tt>-lhthread -lrt -ldl -lbfd</tt> if HTHREAD_ENABLE_CALLSTACK is 1
 
-  compile libhthread
+  compile libhthread with callstack support
 
     # git clone git://github.com/anhanguera/libhthread.git
     # cd libhthread
-    # make
+    # CFLAGS=-DHTHREAD_ENABLE_CALLSTACK=1 make
+  
+  compile libhthread without callstack support
+
+    # git clone git://github.com/anhanguera/libhthread.git
+    # cd libhthread
+    # CFLAGS=-DHTHREAD_ENABLE_CALLSTACK=0 make
   
   let below is the source code - with double lock error - to be monitored:
   

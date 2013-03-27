@@ -11,25 +11,42 @@
 #if !defined(HTHREAD_H)
 #define HTHREAD_H 1
 
+#if !defined(HTHREAD_DISABLE_YIELD)
 #define HTHREAD_DISABLE_YIELD			0
-#define HTHREAD_ENABLE_CALLSTACK		1
+#endif
 
+#if !defined(HTHREAD_ENABLE_CALLSTACK)
+#define HTHREAD_ENABLE_CALLSTACK		1
+#endif
+
+#if !defined(HTHREAD_REPORT_CALLSTACK)
 #define HTHREAD_REPORT_CALLSTACK		1
+#endif
 #define HTHREAD_REPORT_CALLSTACK_NAME		"hthread_report_callstack"
 
+#if !defined(HTHREAD_ASSERT_ON_ERROR)
 #define HTHREAD_ASSERT_ON_ERROR			1
+#endif
 #define HTHREAD_ASSERT_ON_ERROR_NAME		"hthread_assert_on_error"
 
+#if !defined(HTHREAD_LOCK_THRESHOLD)
 #define HTHREAD_LOCK_THRESHOLD			5000
+#endif
 #define HTHREAD_LOCK_THRESHOLD_NAME		"hthread_lock_threshold"
 
+#if !defined(HTHREAD_LOCK_THRESHOLD_ASSERT)
 #define HTHREAD_LOCK_THRESHOLD_ASSERT		0
+#endif
 #define HTHREAD_LOCK_THRESHOLD_ASSERT_NAME	"hthread_lock_threshold_assert"
 
+#if !defined(HTHREAD_LOCK_TRY_THRESHOLD)
 #define HTHREAD_LOCK_TRY_THRESHOLD		5000
+#endif
 #define HTHREAD_LOCK_TRY_THRESHOLD_NAME		"hthread_lock_try_threshold"
 
+#if !defined(HTHREAD_LOCK_TRY_THRESHOLD_ASSERT)
 #define HTHREAD_LOCK_TRY_THRESHOLD_ASSERT	0
+#endif
 #define HTHREAD_LOCK_TRY_THRESHOLD_ASSERT_NAME	"hthread_lock_try_threshold_assert"
 
 struct hthread;
