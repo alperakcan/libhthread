@@ -36,6 +36,7 @@ define test-debug-defaults
 		../src/libhthread.o
 
 	$1_cflags-y = \
+		-O0 \
 		-DHTHREAD_DEBUG=1 \
 		-DHTHREAD_ENABLE_RACE_CHECK=1 \
 		-include ../src/hthread.h

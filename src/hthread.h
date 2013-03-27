@@ -58,6 +58,7 @@ struct hthread_mutex;
 	__r; \
 })
 
+#undef strdup
 #define strdup(string) ({ \
 	void *__r; \
 	char __n[256]; \
@@ -66,6 +67,7 @@ struct hthread_mutex;
 	__r; \
 })
 
+#undef strndup
 #define strndup(string, size) ({ \
 	void *__r; \
 	char __n[256]; \
@@ -74,6 +76,7 @@ struct hthread_mutex;
 	__r; \
 })
 
+#undef malloc
 #define malloc(size) ({ \
 	void *__r; \
 	char __n[256]; \
@@ -82,6 +85,7 @@ struct hthread_mutex;
 	__r; \
 })
 
+#undef calloc
 #define calloc(nmemb, size) ({ \
 	void *__r; \
 	char __n[256]; \
@@ -90,6 +94,7 @@ struct hthread_mutex;
 	__r; \
 })
 
+#undef realloc
 #define realloc(address, size) ({ \
 	void *__r; \
 	char __n[256]; \
@@ -98,6 +103,7 @@ struct hthread_mutex;
 	__r; \
 })
 
+#undef free
 #define free(address) ({ \
 	hthread_free(address); \
 })
