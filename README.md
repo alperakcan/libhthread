@@ -70,6 +70,8 @@
 
 ### 2.1 compile-time options ###
 
+  hthread configuration parameters can be set using <tt>cflags</tt>, please check example section for demonstration.
+
   - HTHREAD_ENABLE_CALLSTACK
   
   
@@ -124,6 +126,8 @@
   
   hthread reads configuration parameters from environment via getenv function call. one can either set/change environment variables in source
   code of monitored project via setenv function call, or set them globally in running shell using export function.
+  
+  please check example section for demonstration.
 
   - hthread_report_callstack
   
