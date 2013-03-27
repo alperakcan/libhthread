@@ -19,7 +19,11 @@
 #if defined(__DARWIN__) && (__DARWIN__ == 1)
 #include <mach/mach_time.h>
 #endif
+#if defined(HTHREAD_ENABLE_CALLSTACK) && (HTHREAD_ENABLE_CALLSTACK == 1)
+#include <bfd.h>
+#include <dlfcn.h>
 #include <execinfo.h>
+#endif
 
 #define HTHREAD_INTERNAL			1
 #define HTHREAD_CALLSTACK_MAX			128
@@ -112,42 +116,40 @@ struct hthread {
 };
 
 struct hthread_cond {
+        pthread_cond_t cond;
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	void *address;
 	UT_hash_handle hh;
 	const char *func;
 	const char *file;
 	int line;
-#endif
-        pthread_cond_t cond;
-#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
         char name[0];
 #endif
 };
 
 struct hthread_mutex {
+	pthread_mutex_t mutex;
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	void *address;
 	UT_hash_handle hh;
 	const char *func;
 	const char *file;
 	int line;
-#endif
-	pthread_mutex_t mutex;
-#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	char name[0];
 #endif
 };
 
-#define hthread_lock()   pthread_mutex_lock(&hthread_mutex)
-#define hthread_unlock() pthread_mutex_unlock(&hthread_mutex)
-#define hthread_self_pthread()   pthread_self()
+#define hthread_lock()			pthread_mutex_lock(&hthread_mutex)
+#define hthread_unlock()		pthread_mutex_unlock(&hthread_mutex)
+#define hthread_self_pthread()		pthread_self()
 
-static struct hthread *hthreads = NULL;
-static struct hthread *hthread_root = NULL;
-static pthread_mutex_t hthread_mutex = PTHREAD_MUTEX_INITIALIZER;
+static struct hthread *hthreads		= NULL;
+static struct hthread *hthread_root	= NULL;
+static pthread_mutex_t hthread_mutex	= PTHREAD_MUTEX_INITIALIZER;
 
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 static inline int hthread_check (struct hthread *thread, const char *command, const char *func, const char *file, const int line);
+#endif
 static inline int hthread_add (struct hthread *thread, const char *func, const char *file, const int line);
 static inline int hthread_del (struct hthread *thread, const char *command, const char *func, const char *file, const int line);
 
@@ -280,7 +282,7 @@ static inline struct hthread * hthread_add_root (const char *command)
 	return th;
 }
 
-static struct hthread * hthread_find_self (const char *command)
+static inline struct hthread * hthread_find_self (const char *command)
 {
 	struct hthread *th;
 #if 0
@@ -303,7 +305,9 @@ found_th:
 	return th;
 }
 
-static struct hthread * hthread_find (pthread_t *thread, const char *command)
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
+
+static inline struct hthread * hthread_find (pthread_t *thread, const char *command)
 {
 	struct hthread *th;
 	(void) command;
@@ -325,7 +329,6 @@ found_th:
 	return th;
 }
 
-#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 static inline int hthread_check (struct hthread *thread, const char *command, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
@@ -839,12 +842,12 @@ void HTHREAD_FUNCTION_NAME(free_actual) (void *address, const char *func, const 
 
 struct hthread_mutex_lock {
 	struct hthread_mutex *mutex;
+	UT_hash_handle hh;
 	struct hthread *thread;
 	const char *func;
 	const char *file;
 	int line;
 	unsigned long long timeval;
-	UT_hash_handle hh;
 };
 
 struct hthread_mutex_order_item {
@@ -900,18 +903,123 @@ static inline unsigned long long debug_getclock (void)
 	return _clock;
 }
 
+struct stackinfo {
+	const char *file;
+	const char *func;
+	unsigned int line;
+	void *func_addr;
+};
+
 static inline int debug_dump_callstack (const char *prefix)
 {
+#if defined(HTHREAD_ENABLE_CALLSTACK) && (HTHREAD_ENABLE_CALLSTACK == 1)
 	int i;
+	int rc;
+	int size;
 	int frames;
 	char **strs;
+	bfd *bfd;
+	bfd_vma ofs;
+	bfd_vma start;
+	Dl_info dlinfo;
+	asymbol **syms;
+	asection *secp;
+	unsigned int v;
+	const char *fname;
+	const char *func;
+	unsigned int line;
+	struct stackinfo stackinfo;
 	void *callstack[HTHREAD_CALLSTACK_MAX];
+	v = hthread_getenv_int(HTHREAD_REPORT_CALLSTACK_NAME);
+	if (v == (unsigned int) -1) {
+		v = HTHREAD_REPORT_CALLSTACK;
+	}
+	if (v == 0) {
+		return 0;
+	}
 	frames = backtrace(callstack, HTHREAD_CALLSTACK_MAX);
 	strs = backtrace_symbols(callstack, frames);
+	for (i = 1; i < frames; i++) {
+		if (dladdr(callstack[i], &dlinfo)) {
+			memset(&stackinfo, 0, sizeof(struct stackinfo));
+			stackinfo.func = dlinfo.dli_sname;
+			stackinfo.func_addr = dlinfo.dli_saddr;
+			bfd = bfd_openr(dlinfo.dli_fname, NULL);
+			if (bfd == NULL) {
+				continue;
+			}
+			rc = bfd_check_format(bfd, bfd_object);
+			if (rc == 0) {
+				bfd_close(bfd);
+				continue;
+			}
+			size = bfd_get_symtab_upper_bound(bfd);
+			if (size <= 0) {
+				bfd_close(bfd);
+				continue;
+			}
+			syms = malloc(size);
+			if (syms == NULL) {
+				bfd_close(bfd);
+				continue;
+			}
+			rc = bfd_canonicalize_symtab(bfd, syms);
+			if (rc <= 0) {
+				free(syms);
+				bfd_close(bfd);
+				continue;
+			}
+			#define ELF_DYNAMIC	0x40
+			if (bfd->flags & ELF_DYNAMIC) {
+				ofs = callstack[i] - dlinfo.dli_fbase;
+			} else {
+				ofs = callstack[i] - (void *) 0;
+			}
+			for (secp = bfd->sections; secp != NULL; secp = secp->next) {
+				if (!(bfd_get_section_flags(bfd, secp) & SEC_ALLOC)) {
+					continue;
+				}
+				start = bfd_get_section_vma(bfd, secp);
+				if (ofs < start) {
+					continue;
+				}
+				size = bfd_get_section_size(secp);
+				if (ofs >= start + size) {
+					continue;
+				}
+				if (bfd_find_nearest_line(bfd, secp, syms, ofs - start, &fname, &func, &line)) {
+					stackinfo.file = fname;
+					if (func != NULL) {
+						stackinfo.func = func;
+					}
+					stackinfo.line = line;
+					if (!stackinfo.func_addr && stackinfo.func) {
+						asymbol **asymp;
+						for (asymp = syms; *asymp; asymp++) {
+							if (strcmp (bfd_asymbol_name (*asymp), stackinfo.func) == 0) {
+								stackinfo.func_addr = bfd_asymbol_value (*asymp) + (void *) 0;
+								break;
+							}
+						}
+					}
+				}
+
+				break;
+			}
+			hinfof("%s%p: %s (%s:%d)", prefix, callstack[i], (stackinfo.file == NULL) ? "(null)" : ((strrchr(stackinfo.file, '/') == NULL) ? stackinfo.file : (strrchr(stackinfo.file, '/') + 1)), stackinfo.func, stackinfo.line);
+			free(syms);
+			bfd_close(bfd);
+		}
+	}
+#if 0
 	for (i = 0; i < frames; i++) {
 		hinfof("%s%s", prefix, strs[i]);
 	}
+#endif
 	free(strs);
+#else
+	(void) prefix;
+#endif
 	return 0;
 }
 
@@ -936,7 +1044,7 @@ static inline int debug_mutex_add_lock (struct hthread_mutex *mutex, const char 
 	hthread_unlock();
 	return -1;
 found_th:
-	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
+	HASH_FIND(hh, debug_mutexes, &mutex->address, sizeof(mutex->address), mt);
 	if (mt != NULL) {
 		goto found_mt;
 	}
@@ -950,7 +1058,7 @@ found_th:
 	hthread_unlock();
 	return -1;
 found_mt:
-	HASH_FIND_PTR(th->locks, mutex, mtl);
+	HASH_FIND(hh, th->locks, &mutex, sizeof(mutex), mtl);
 	if (mtl != NULL) {
 		hdebug_lock();
 		hinfof("%s with already held mutex: '%s (%p)'", command, mutex->name, mutex);
@@ -1072,7 +1180,7 @@ found_mt:
 	nmtl->file = file;
 	nmtl->line = line;
 	nmtl->timeval = debug_getclock();
-	HASH_ADD_PTR(th->locks, mutex, nmtl);
+	HASH_ADD(hh, th->locks, mutex, sizeof(mutex), nmtl);
 	hdebugf("added lock mutex: %s @ %p, to thread: %s @ %p", mutex->name, mutex, th->name, th);
 	hthread_unlock();
 	return 0;
@@ -1097,7 +1205,7 @@ static int debug_mutex_try_lock (struct hthread_mutex *mutex, const char *comman
 	hthread_unlock();
 	return -1;
 found_th:
-	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
+	HASH_FIND(hh, debug_mutexes, &mutex->address, sizeof(mutex->address), mt);
 	if (mt != NULL) {
 		goto found_mt;
 	}
@@ -1137,7 +1245,7 @@ found_mt:
 			hthread_unlock();
 			return -1;
 found_th_:
-			HASH_FIND_PTR(debug_mutexes, &mutex, mt);
+			HASH_FIND(hh, debug_mutexes, &mutex->address, sizeof(mutex->address), mt);
 			if (mt != NULL) {
 				goto found_mt_;
 			}
@@ -1156,7 +1264,7 @@ found_mt_:
 			hinfof("    at: %s %s:%d", func, file, line);
 			debug_dump_callstack("        ");
 			HASH_ITER(hh, hthreads, th, nth) {
-				HASH_FIND_PTR(th->locks, mutex, mtl);
+				HASH_FIND(hh, th->locks, &mutex, sizeof(mutex), mtl);
 				if (mtl != NULL) {
 					hinfof("  currently locked");
 					hinfof("    by: %s (%p)", mtl->thread->name, mtl->thread);
@@ -1183,7 +1291,7 @@ static inline struct hthread_mutex_lock * debug_mutex_find_lock (struct hthread_
 	(void) func;
 	(void) file;
 	(void) line;
-	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
+	HASH_FIND(hh, debug_mutexes, &mutex->address, sizeof(mutex->address), mt);
 	if (mt != NULL) {
 		goto found_mt;
 	}
@@ -1191,7 +1299,7 @@ static inline struct hthread_mutex_lock * debug_mutex_find_lock (struct hthread_
 	return NULL;
 found_mt:
 	HASH_ITER(hh, hthreads, th, nth) {
-		HASH_FIND_PTR(th->locks, mutex, mtl);
+		HASH_FIND(hh, th->locks, &mutex, sizeof(mutex), mtl);
 		if (mtl != NULL) {
 			return mtl;
 		}
@@ -1216,7 +1324,7 @@ static inline int debug_mutex_del_lock (struct hthread_mutex *mutex, const char 
 	hthread_unlock();
 	return -1;
 found_th:
-	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
+	HASH_FIND(hh, debug_mutexes, &mutex->address, sizeof(mutex->address), mt);
 	if (mt != NULL) {
 		goto found_mt;
 	}
@@ -1230,7 +1338,7 @@ found_th:
 	hthread_unlock();
 	return -1;
 found_mt:
-	HASH_FIND_PTR(th->locks, mutex, mtl);
+	HASH_FIND(hh, th->locks, &mutex, sizeof(mutex), mtl);
 	if (mtl != NULL) {
 		goto found_lc;
 	}
@@ -1307,7 +1415,7 @@ static inline int debug_mutex_add (struct hthread_mutex *mutex, const char *comm
 	hthread_unlock();
 	return -1;
 found_th:
-	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
+	HASH_FIND(hh, debug_mutexes, &mutex->address, sizeof(mutex->address), mt);
 	if (mt != NULL) {
 		hassertf("mutex: %s is already in list", mutex->name);
 		hthread_unlock();
@@ -1318,7 +1426,7 @@ found_th:
 	mutex->func = func;
 	mutex->file = file;
 	mutex->line = line;
-	HASH_ADD_PTR(debug_mutexes, address, mutex);
+	HASH_ADD(hh, debug_mutexes, address, sizeof(mutex->address), mutex);
 	hthread_unlock();
 	return 0;
 }
@@ -1339,7 +1447,7 @@ static inline int debug_mutex_del (struct hthread_mutex *mutex, const char *comm
 	hthread_unlock();
 	return -1;
 found_th:
-	HASH_FIND_PTR(debug_mutexes, &mutex, mt);
+	HASH_FIND(hh, debug_mutexes, &mutex->address, sizeof(mutex->address), mt);
 	if (mt != NULL) {
 		goto found_mt;
 	}
@@ -1353,7 +1461,7 @@ found_th:
 	hthread_unlock();
 	return -1;
 found_mt:
-	HASH_FIND_PTR(th->locks, mutex, mtl);
+	HASH_FIND(hh, th->locks, &mutex, sizeof(mutex), mtl);
 	if (mtl != NULL) {
 		hdebug_lock();
 		hinfof("%s with currently locked mutex: '%p'", command, mutex);
@@ -1397,7 +1505,7 @@ static inline int debug_cond_add (struct hthread_cond *cond, const char *command
 	hthread_unlock();
 	return -1;
 found_th:
-	HASH_FIND_PTR(debug_conds, &cond, cv);
+	HASH_FIND(hh, debug_conds, &cond, sizeof(cond), cv);
 	if (cv != NULL) {
 		hassertf("cond: %s is already in list", cond->name);
 		hthread_unlock();
@@ -1408,7 +1516,7 @@ found_th:
 	cond->func = func;
 	cond->file = file;
 	cond->line = line;
-	HASH_ADD_PTR(debug_conds, address, cond);
+	HASH_ADD(hh, debug_conds, address, sizeof(cond), cond);
 	hthread_unlock();
 	return 0;
 }
@@ -1426,7 +1534,7 @@ static inline int debug_cond_del (struct hthread_cond *cond, const char *command
 	hthread_unlock();
 	return -1;
 found_th:
-	HASH_FIND_PTR(debug_conds, &cond, cv);
+	HASH_FIND(hh, debug_conds, &cond, sizeof(cond), cv);
 	if (cv != NULL) {
 		goto found_cv;
 	}
@@ -1459,7 +1567,7 @@ static inline int debug_cond_check (struct hthread_cond *cond, const char *comma
 	hthread_unlock();
 	return -1;
 found_th:
-	HASH_FIND_PTR(debug_conds, &cond, cv);
+	HASH_FIND(hh, debug_conds, &cond, sizeof(cond), cv);
 	if (cv != NULL) {
 		goto found_cv;
 	}
