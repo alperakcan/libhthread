@@ -70,12 +70,12 @@
 
 ### 2.1 compile-time options ###
 
-  hthread configuration parameters can be set using <tt>cflags</tt>, please check example section for demonstration.
+  hthread configuration parameters can be set using <tt>make flags</tt>, please check example section for demonstration.
 
   - HTHREAD_ENABLE_CALLSTACK
   
   
-    default yes
+    default 1
     
     enable/disable reporting call trace information on error, useful but depends on <tt>libbdf</tt>, <tt>libdl</tt>, and <tt>backtrace function from glibc</tt>.
     may be disabled for toolchains which does not support backtracing.
@@ -83,14 +83,14 @@
   - HTHREAD_REPORT_CALLSTACK
   
   
-    default yes
+    default 1
     
     dump callstack info (function call history) for error point.
   
   - HTHREAD_ASSERT_ON_ERROR
   
     
-    default yes
+    default 1
     
     terminate the process on any pthreads api misuse and/or lock order violation.
   
@@ -104,7 +104,7 @@
   - HTHREAD_LOCK_THRESHOLD_ASSERT
   
     
-    default no
+    default 0
     
     terminate if lock is held longer than the specified time, in miliseconds.
   
@@ -118,7 +118,7 @@
   - HTHREAD_LOCK_TRY_THRESHOLD_ASSERT
   
     
-    default no
+    default 0
     
     terminate if locking operation takes longer than the specified time, in miliseconds.
  
@@ -132,14 +132,14 @@
   - hthread_report_callstack
   
   	
-  	default yes
+  	default 1
 
   	dump callstack info (function call history) for error point.
   
   - hthread_assert_on_error
   
     
-    default yes
+    default 1
     
     terminate the process on any pthreads api misuse and/or lock order violation.
   
@@ -153,7 +153,7 @@
   - hthread_lock_hreashold_assert
   
     
-    default no
+    default 0
     
     terminate if lock is held longer than the specified time, in miliseconds.
   
@@ -167,7 +167,7 @@
   - hthread_lock_try_threshold_assert
   
     
-    default no
+    default 0
     
     terminate if locking operation takes longer than the specified time, in miliseconds.
 
@@ -1056,13 +1056,13 @@
 
     # git clone git://github.com/anhanguera/libhthread.git
     # cd libhthread
-    # CFLAGS=-DHTHREAD_ENABLE_CALLSTACK=1 make
+    # HTHREAD_ENABLE_CALLSTACK=1 make
   
   compile libhthread without callstack support
 
     # git clone git://github.com/anhanguera/libhthread.git
     # cd libhthread
-    # CFLAGS=-DHTHREAD_ENABLE_CALLSTACK=0 make
+    # HTHREAD_ENABLE_CALLSTACK=0 make
   
   let below is the source code - with double lock error - to be monitored:
   
