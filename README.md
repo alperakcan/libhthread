@@ -65,8 +65,8 @@
 
 ## 2. configuration ##
 
-  1. <a href="">compile-time options</a>
-  2. <a href="">run-time options</a>
+  1. <a href="#21-compile-time-options">compile-time options</a>
+  2. <a href="#22-runt-ime-options">run-time options</a>
 
 ### 2.1 compile-time options ###
 
