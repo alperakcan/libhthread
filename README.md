@@ -65,13 +65,13 @@
 
 ## 2. configuration ##
 
+### 2.1 runtime options ###
+  
   hthread reads configuration parameters from environment via getenv function call. one can either set/change environment variables in source
   code of monitored project via setenv function call, or set them globally in running shell using export function.
-  
+
   - hthread_report_callstack
   
-  	
-  	
   	
   	default yes
 
