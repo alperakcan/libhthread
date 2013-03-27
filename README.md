@@ -66,7 +66,7 @@
 ## 2. configuration ##
 
   1. <a href="#21-compile-time-options">compile-time options</a>
-  2. <a href="#22-runt-ime-options">run-time options</a>
+  2. <a href="#22-run-time-options">run-time options</a>
 
 ### 2.1 compile-time options ###
 
@@ -122,7 +122,7 @@
     
     terminate if locking operation takes longer than the specified time, in miliseconds.
  
-### 2.2 runt-ime options ###
+### 2.2 run-time options ###
   
   hthread reads configuration parameters from environment via getenv function call. one can either set/change environment variables in source
   code of monitored project via setenv function call, or set them globally in running shell using export function.
