@@ -12,6 +12,10 @@
 #define HTHREAD_H 1
 
 #define HTHREAD_DISABLE_YIELD			0
+#define HTHREAD_ENABLE_CALLSTACK		1
+
+#define HTHREAD_REPORT_CALLSTACK		1
+#define HTHREAD_REPORT_CALLSTACK_NAME		"hthread_report_callstack"
 
 #define HTHREAD_ASSERT_ON_ERROR			1
 #define HTHREAD_ASSERT_ON_ERROR_NAME		"hthread_assert_on_error"

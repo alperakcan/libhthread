@@ -19,6 +19,8 @@
 #if defined(__DARWIN__) && (__DARWIN__ == 1)
 #include <mach/mach_time.h>
 #endif
+#include <bfd.h>
+#include <dlfcn.h>
 #include <execinfo.h>
 
 #define HTHREAD_INTERNAL			1
@@ -794,18 +796,123 @@ static inline unsigned long long debug_getclock (void)
 	return _clock;
 }
 
+struct stackinfo {
+	const char *file;
+	const char *func;
+	unsigned int line;
+	void *func_addr;
+};
+
 static inline int debug_dump_callstack (const char *prefix)
 {
+#if defined(HTHREAD_ENABLE_CALLSTACK) && (HTHREAD_ENABLE_CALLSTACK == 1)
 	int i;
+	int rc;
+	int size;
 	int frames;
 	char **strs;
+	bfd *bfd;
+	bfd_vma ofs;
+	bfd_vma start;
+	Dl_info dlinfo;
+	asymbol **syms;
+	asection *secp;
+	unsigned int v;
+	const char *fname;
+	const char *func;
+	unsigned int line;
+	struct stackinfo stackinfo;
 	void *callstack[HTHREAD_CALLSTACK_MAX];
+	v = hthread_getenv_int(HTHREAD_REPORT_CALLSTACK_NAME);
+	if (v == (unsigned int) -1) {
+		v = HTHREAD_REPORT_CALLSTACK;
+	}
+	if (v == 0) {
+		return 0;
+	}
 	frames = backtrace(callstack, HTHREAD_CALLSTACK_MAX);
 	strs = backtrace_symbols(callstack, frames);
+	for (i = 1; i < frames; i++) {
+		if (dladdr(callstack[i], &dlinfo)) {
+			memset(&stackinfo, 0, sizeof(struct stackinfo));
+			stackinfo.func = dlinfo.dli_sname;
+			stackinfo.func_addr = dlinfo.dli_saddr;
+			bfd = bfd_openr(dlinfo.dli_fname, NULL);
+			if (bfd == NULL) {
+				continue;
+			}
+			rc = bfd_check_format(bfd, bfd_object);
+			if (rc == 0) {
+				bfd_close(bfd);
+				continue;
+			}
+			size = bfd_get_symtab_upper_bound(bfd);
+			if (size <= 0) {
+				bfd_close(bfd);
+				continue;
+			}
+			syms = malloc(size);
+			if (syms == NULL) {
+				bfd_close(bfd);
+				continue;
+			}
+			rc = bfd_canonicalize_symtab(bfd, syms);
+			if (rc <= 0) {
+				free(syms);
+				bfd_close(bfd);
+				continue;
+			}
+			#define ELF_DYNAMIC	0x40
+			if (bfd->flags & ELF_DYNAMIC) {
+				ofs = callstack[i] - dlinfo.dli_fbase;
+			} else {
+				ofs = callstack[i] - (void *) 0;
+			}
+			for (secp = bfd->sections; secp != NULL; secp = secp->next) {
+				if (!(bfd_get_section_flags(bfd, secp) & SEC_ALLOC)) {
+					continue;
+				}
+				start = bfd_get_section_vma(bfd, secp);
+				if (ofs < start) {
+					continue;
+				}
+				size = bfd_get_section_size(secp);
+				if (ofs >= start + size) {
+					continue;
+				}
+				if (bfd_find_nearest_line(bfd, secp, syms, ofs - start, &fname, &func, &line)) {
+					stackinfo.file = fname;
+					if (func != NULL) {
+						stackinfo.func = func;
+					}
+					stackinfo.line = line;
+					if (!stackinfo.func_addr && stackinfo.func) {
+						asymbol **asymp;
+						for (asymp = syms; *asymp; asymp++) {
+							if (strcmp (bfd_asymbol_name (*asymp), stackinfo.func) == 0) {
+								stackinfo.func_addr = bfd_asymbol_value (*asymp) + (void *) 0;
+								break;
+							}
+						}
+					}
+				}
+
+				break;
+			}
+			hinfof("%s%p: %s (%s:%d)", prefix, callstack[i], (stackinfo.file == NULL) ? "(null)" : ((strrchr(stackinfo.file, '/') == NULL) ? stackinfo.file : (strrchr(stackinfo.file, '/') + 1)), stackinfo.func, stackinfo.line);
+			free(syms);
+			bfd_close(bfd);
+		}
+	}
+#if 0
 	for (i = 0; i < frames; i++) {
 		hinfof("%s%s", prefix, strs[i]);
 	}
+#endif
 	free(strs);
+#else
+	(void) prefix;
+#endif
 	return 0;
 }
 

@@ -15,8 +15,7 @@ uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 
 define test-defaults
 	$1_files-y = \
-		$(addsuffix .c, $1) \
-		../src/libhthread.o
+		$(addsuffix .c, $1)
 
 	$1_includes-y = \
 		../src
@@ -43,7 +42,10 @@ define test-debug-defaults
 		../src
 	
 	$1_ldflags-y = \
-		-lpthread
+		-lpthread \
+		-rdynamic \
+		-ldl \
+		-lbfd
 	
 ifeq ($(uname_S),Linux)
 	$1_ldflags-y += \
