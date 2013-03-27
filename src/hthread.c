@@ -280,7 +280,7 @@ static inline struct hthread * hthread_add_root (const char *command)
 	return th;
 }
 
-static struct hthread * debug_thread_find_self (const char *command)
+static struct hthread * hthread_find_self (const char *command)
 {
 	struct hthread *th;
 #if 0
@@ -303,7 +303,7 @@ found_th:
 	return th;
 }
 
-static struct hthread * debug_thread_find (pthread_t *thread, const char *command)
+static struct hthread * hthread_find (pthread_t *thread, const char *command)
 {
 	struct hthread *th;
 	(void) command;
@@ -330,7 +330,7 @@ static inline int hthread_check (struct hthread *thread, const char *command, co
 	struct hthread *th;
 	struct hthread *sth;
 	hthread_lock();
-	sth = debug_thread_find_self(command);
+	sth = hthread_find_self(command);
 	if (sth != NULL) {
 		goto found_sth;
 	}
@@ -338,7 +338,7 @@ static inline int hthread_check (struct hthread *thread, const char *command, co
 	hthread_unlock();
 	return -1;
 found_sth:
-	th = debug_thread_find(&thread->thread, command);
+	th = hthread_find(&thread->thread, command);
 	if (th != NULL) {
 		goto found_th;
 	}
@@ -721,7 +721,7 @@ struct hthread * HTHREAD_FUNCTION_NAME(self_actual) (const char *func, const cha
 	(void) file;
 	(void) line;
 	hthread_lock();
-	th = debug_thread_find_self("self");
+	th = hthread_find_self("self");
 	hthread_unlock();
 	return th;
 }
@@ -932,7 +932,7 @@ static inline int debug_mutex_add_lock (struct hthread_mutex *mutex, const char 
 	struct hthread_mutex_order *ndmto;
 	struct hthread_mutex_order_key key;
 	hthread_lock();
-	th = debug_thread_find_self(command);
+	th = hthread_find_self(command);
 	if (th != NULL) {
 		goto found_th;
 	}
@@ -1093,7 +1093,7 @@ static int debug_mutex_try_lock (struct hthread_mutex *mutex, const char *comman
 	struct hthread_mutex *mt;
 	struct hthread_mutex_lock *mtl;
 	hthread_lock();
-	th = debug_thread_find_self(command);
+	th = hthread_find_self(command);
 	if (th != NULL) {
 		goto found_th;
 	}
@@ -1133,7 +1133,7 @@ found_mt:
 		}
 		if (t >= ((v * 1000) / 10000) && (v != 0)) {
 			hthread_lock();
-			th = debug_thread_find_self(command);
+			th = hthread_find_self(command);
 			if (th != NULL) {
 				goto found_th_;
 			}
@@ -1212,7 +1212,7 @@ static inline int debug_mutex_del_lock (struct hthread_mutex *mutex, const char 
 	unsigned int a;
 	unsigned long long timeval;
 	hthread_lock();
-	th = debug_thread_find_self(command);
+	th = hthread_find_self(command);
 	if (th != NULL) {
 		goto found_th;
 	}
@@ -1303,7 +1303,7 @@ static inline int debug_mutex_add (struct hthread_mutex *mutex, const char *comm
 	struct hthread *th;
 	struct hthread_mutex *mt;
 	hthread_lock();
-	th = debug_thread_find_self(command);
+	th = hthread_find_self(command);
 	if (th != NULL) {
 		goto found_th;
 	}
@@ -1335,7 +1335,7 @@ static inline int debug_mutex_del (struct hthread_mutex *mutex, const char *comm
 	struct hthread_mutex_order *mto;
 	struct hthread_mutex_order *nmto;
 	hthread_lock();
-	th = debug_thread_find_self(command);
+	th = hthread_find_self(command);
 	if (th != NULL) {
 		goto found_th;
 	}
@@ -1393,7 +1393,7 @@ static inline int debug_cond_add (struct hthread_cond *cond, const char *command
 	struct hthread *th;
 	struct hthread_cond *cv;
 	hthread_lock();
-	th = debug_thread_find_self(command);
+	th = hthread_find_self(command);
 	if (th != NULL) {
 		goto found_th;
 	}
@@ -1422,7 +1422,7 @@ static inline int debug_cond_del (struct hthread_cond *cond, const char *command
 	struct hthread *th;
 	struct hthread_cond *cv;
 	hthread_lock();
-	th = debug_thread_find_self(command);
+	th = hthread_find_self(command);
 	if (th != NULL) {
 		goto found_th;
 	}
@@ -1455,7 +1455,7 @@ static inline int debug_cond_check (struct hthread_cond *cond, const char *comma
 	struct hthread *th;
 	struct hthread_cond *cv;
 	hthread_lock();
-	th = debug_thread_find_self(command);
+	th = hthread_find_self(command);
 	if (th != NULL) {
 		goto found_th;
 	}
