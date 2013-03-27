@@ -30,7 +30,7 @@ static pthread_mutex_t debugf_mutex = PTHREAD_MUTEX_INITIALIZER;
 #define hdebug_lock() pthread_mutex_lock(&debugf_mutex);
 #define hdebug_unlock() pthread_mutex_unlock(&debugf_mutex);
 
-#if 1
+#if 0
 #define hdebugf(a...) { \
 	hdebug_lock(); \
 	fprintf(stderr, "hthread::debug: "); \
@@ -131,18 +131,6 @@ struct hthread_mutex {
 #endif
 	pthread_mutex_t mutex;
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
-	char name[0];
-#endif
-};
-
-struct hthread_memory {
-	void *address;
-#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
-	UT_hash_handle hh;
-	const char *func;
-	const char *file;
-	int line;
-	size_t size;
 	char name[0];
 #endif
 };
@@ -722,10 +710,14 @@ int HTHREAD_FUNCTION_NAME(detach_actual) (struct hthread *thread, const char *fu
 
 struct hthread * HTHREAD_FUNCTION_NAME(self_actual) (const char *func, const char *file, const int line)
 {
+	struct hthread *th;
 	(void) func;
 	(void) file;
 	(void) line;
-	return debug_thread_find_self("self");
+	hthread_lock();
+	th = debug_thread_find_self("self");
+	hthread_unlock();
+	return th;
 }
 
 int HTHREAD_FUNCTION_NAME(sched_yield_actual) (const char *func, const char *file, const int line)
@@ -741,12 +733,42 @@ int HTHREAD_FUNCTION_NAME(sched_yield_actual) (const char *func, const char *fil
 }
 
 
+void * HTHREAD_FUNCTION_NAME(memset_actual) (void *destination, int c, size_t len, const char *func, const char *file, const int line)
+{
+	void *rc;
+	(void) func;
+	(void) file;
+	(void) line;
+	rc = memset(destination, c, len);
+	return rc;
+}
+
+void * HTHREAD_FUNCTION_NAME(memcpy_actual) (void *destination, void *source, size_t len, const char *func, const char *file, const int line)
+{
+	void *rc;
+	(void) func;
+	(void) file;
+	(void) line;
+	rc = memcpy(destination, source, len);
+	return rc;
+}
+
 char * HTHREAD_FUNCTION_NAME(strdup_actual) (const char *name, const char *string, const char *func, const char *file, const int line)
 {
 	void *rc;
 	if (string == NULL) {
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
+		struct hthread *th;
+		hthread_lock();
+		th = debug_thread_find_self("strdup");
+		hdebug_lock();
 		hinfof("strdup with invalid argument '%p'", string);
+		hinfof("    by: %s (%p)", th->name, th);
 		hinfof("    at: %s %s:%d", func, file, line);
+		hdebug_unlock();
+		hassert((string != NULL) && "invalid strdup parameter");
+		hthread_unlock();
+#endif
 		return NULL;
 	}
 	rc = strdup(string);
@@ -758,8 +780,18 @@ char * HTHREAD_FUNCTION_NAME(strndup_actual) (const char *name, const char *stri
 {
 	void *rc;
 	if (string == NULL) {
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
+		struct hthread *th;
+		hthread_lock();
+		th = debug_thread_find_self("strndup");
+		hdebug_lock();
 		hinfof("strdup with invalid argument '%p'", string);
+		hinfof("    by: %s (%p)", th->name, th);
 		hinfof("    at: %s %s:%d", func, file, line);
+		hdebug_unlock();
+		hassert((string != NULL) && "invalid strdup parameter");
+		hthread_unlock();
+#endif
 		return NULL;
 	}
 	rc = strndup(string, size);
@@ -1415,6 +1447,16 @@ found_cv:
 	hthread_unlock();
 	return 0;
 }
+
+struct hthread_memory {
+	void *address;
+	UT_hash_handle hh;
+	const char *func;
+	const char *file;
+	int line;
+	size_t size;
+	char name[0];
+};
 
 static struct hthread_memory *debug_memory = NULL;
 

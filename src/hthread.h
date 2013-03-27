@@ -44,6 +44,20 @@ struct hthread_mutex;
 
 #if defined(HTHREAD_ENABLE_RACE_CHECK) && (HTHREAD_ENABLE_RACE_CHECK == 1)
 
+#undef memset
+#define memset(b, c, len) ({ \
+	void *__r; \
+	__r = hthread_memset(b, c, len); \
+	__r; \
+})
+
+#undef memcpy
+#define memcpy(s1, s2, n) ({ \
+	void *__r; \
+	__r = hthread_memcpy(s1, s2, n); \
+	__r; \
+})
+
 #define strdup(string) ({ \
 	void *__r; \
 	char __n[256]; \
@@ -243,6 +257,9 @@ struct hthread_mutex;
 
 #endif
 
+#define hthread_memset(a, b, c)               HTHREAD_FUNCTION_NAME(memset_actual)(a, b, c, __FUNCTION__, __FILE__, __LINE__)
+#define hthread_memcpy(a, b, c)               HTHREAD_FUNCTION_NAME(memcpy_actual)(a, b, c, __FUNCTION__, __FILE__, __LINE__)
+
 #define hthread_strdup(a, b)                  HTHREAD_FUNCTION_NAME(strdup_actual)(a, b, __FUNCTION__, __FILE__, __LINE__)
 #define hthread_strndup(a, b, c)              HTHREAD_FUNCTION_NAME(strndup_actual)(a, b, c, __FUNCTION__, __FILE__, __LINE__)
 #define hthread_malloc(a, b)                  HTHREAD_FUNCTION_NAME(malloc_actual)(a, b, __FUNCTION__, __FILE__, __LINE__)
@@ -269,6 +286,9 @@ struct hthread_mutex;
 #define hthread_cond_signal(a)                HTHREAD_FUNCTION_NAME(cond_signal_actual)(a, __FUNCTION__, __FILE__, __LINE__)
 #define hthread_cond_broadcast(a)             HTHREAD_FUNCTION_NAME(cond_broadcast_actual)(a, __FUNCTION__, __FILE__, __LINE__)
 #define hthread_cond_destroy(a)               HTHREAD_FUNCTION_NAME(cond_destroy_actual)(a, __FUNCTION__, __FILE__, __LINE__)
+
+void * HTHREAD_FUNCTION_NAME(memset_actual) (void *destination, int c, size_t len, const char *func, const char *file, const int line);
+void * HTHREAD_FUNCTION_NAME(memcpy_actual) (void *destination, void *source, size_t len, const char *func, const char *file, const int line);
 
 char * HTHREAD_FUNCTION_NAME(strdup_actual) (const char *name, const char *string, const char *func, const char *file, const int line);
 char * HTHREAD_FUNCTION_NAME(strndup_actual) (const char *name, const char *string, size_t size, const char *func, const char *file, const int line);

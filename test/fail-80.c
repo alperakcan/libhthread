@@ -54,7 +54,7 @@ int main (int argc, char *argv[])
 	free(rc + 10);
 	rc = strndup(argv[0], 1024);
 	if (rc == NULL) {
-		fprintf(stderr, "strdup failed\n");
+		fprintf(stderr, "strndup failed\n");
 		exit(-1);
 	}
 	free(rc + 10);
