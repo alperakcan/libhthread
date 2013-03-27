@@ -42,7 +42,9 @@ define test-debug-defaults
 		../src
 	
 	$1_ldflags-y = \
-		-lpthread \
+		-lpthread
+		
+	$1_ldflags-${HTHREAD_ENABLE_CALLSTACK} += \
 		-rdynamic \
 		-ldl \
 		-lbfd
