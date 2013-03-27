@@ -987,6 +987,7 @@
   - and link with <tt>-lhthread -lrt</tt> if HTHREAD_ENABLE_CALLSTACK is 0
   - and link with <tt>-lhthread -lrt -ldl -lbfd</tt> if HTHREAD_ENABLE_CALLSTACK is 1
 
+  compile libhthread
 
     # git clone git://github.com/anhanguera/libhthread.git
     # cd libhthread
