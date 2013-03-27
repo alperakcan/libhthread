@@ -712,10 +712,14 @@ int HTHREAD_FUNCTION_NAME(detach_actual) (struct hthread *thread, const char *fu
 
 struct hthread * HTHREAD_FUNCTION_NAME(self_actual) (const char *func, const char *file, const int line)
 {
+	struct hthread *th;
 	(void) func;
 	(void) file;
 	(void) line;
-	return hthread_find_self("self");
+	hthread_lock();
+	th = hthread_find_self("self");
+	hthread_unlock();
+	return th;
 }
 
 int HTHREAD_FUNCTION_NAME(sched_yield_actual) (const char *func, const char *file, const int line)
