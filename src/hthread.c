@@ -766,7 +766,7 @@ char * HTHREAD_FUNCTION_NAME(strdup_actual) (const char *name, const char *strin
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 		struct hthread *th;
 		hthread_lock();
-		th = debug_thread_find_self("strdup");
+		th = hthread_find_self("strdup");
 		hdebug_lock();
 		hinfof("strdup with invalid argument '%p'", string);
 		hinfof("    by: %s (%p)", th->name, th);
@@ -789,7 +789,7 @@ char * HTHREAD_FUNCTION_NAME(strndup_actual) (const char *name, const char *stri
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 		struct hthread *th;
 		hthread_lock();
-		th = debug_thread_find_self("strndup");
+		th = hthread_find_self("strndup");
 		hdebug_lock();
 		hinfof("strdup with invalid argument '%p'", string);
 		hinfof("    by: %s (%p)", th->name, th);
