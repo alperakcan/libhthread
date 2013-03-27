@@ -321,6 +321,7 @@ found_th:
 	return th;
 }
 
+#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 static inline int hthread_check (struct hthread *thread, const char *command, const char *func, const char *file, const int line)
 {
 	struct hthread *th;
@@ -338,18 +339,12 @@ found_sth:
 	if (th != NULL) {
 		goto found_th;
 	}
-#if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	hdebug_lock();
 	hinfof("%s with invalid thread: '%p'", command, thread);
 	hinfof("    by: %s (%p)", sth->name, sth);
 	hinfof("    at: %s %s:%d", func, file, line);
 	debug_dump_callstack("        ");
 	hdebug_unlock();
-#else
-	(void) func;
-	(void) file;
-	(void) line;
-#endif
 	hassert((th == thread) && "invalid thread");
 	hthread_unlock();
 	return -1;
@@ -357,6 +352,7 @@ found_th:
 	hthread_unlock();
 	return 0;
 }
+#endif
 
 static inline int hthread_add (struct hthread *thread, const char *func, const char *file, const int line)
 {
