@@ -1,4 +1,6 @@
 
+HTHREAD_ENABLE_CALLSTACK ?= y
+
 tests-success-y = \
 	$(subst .c, , $(wildcard success-*.c))
 

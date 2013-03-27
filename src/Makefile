@@ -14,6 +14,10 @@ libhthread.o_files-y = \
 libhthread.so_files-y = \
 	libhthread.o
 
+libhthread.so_ldflags-y = \
+	-lpthread \
+	-lrt
+
 libhthread-actual.o_files-y = \
 	hthread.c
 
