@@ -19,17 +19,18 @@
 #if defined(__DARWIN__) && (__DARWIN__ == 1)
 #include <mach/mach_time.h>
 #endif
-#if defined(HTHREAD_ENABLE_CALLSTACK) && (HTHREAD_ENABLE_CALLSTACK == 1)
-#include <bfd.h>
-#include <dlfcn.h>
-#include <execinfo.h>
-#endif
 
 #define HTHREAD_INTERNAL			1
 #define HTHREAD_CALLSTACK_MAX			128
 
 #include "hthread.h"
 #include "uthash.h"
+
+#if defined(HTHREAD_ENABLE_CALLSTACK) && (HTHREAD_ENABLE_CALLSTACK == 1)
+#include <bfd.h>
+#include <dlfcn.h>
+#include <execinfo.h>
+#endif
 
 static pthread_mutex_t debugf_mutex = PTHREAD_MUTEX_INITIALIZER;
 
