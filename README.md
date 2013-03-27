@@ -72,37 +72,43 @@
   
   	
   	default yes
+
   	dump callstack info (function call history) for error point.
   
   - hthread_assert_on_error
   
-    > default yes
     
-    > terminate the process on any pthreads api misuse and/or lock order violation.
+    default yes
+    
+    terminate the process on any pthreads api misuse and/or lock order violation.
   
   - hthread_lock_hreashold
   
-    > default 5000 miliseconds
     
-    > print report if lock is held longer than the specified time, in miliseconds.
+    default 5000 miliseconds
+    
+    print report if lock is held longer than the specified time, in miliseconds.
   
   - hthread_lock_hreashold_assert
   
-    > default no
     
-    > terminate if lock is held longer than the specified time, in miliseconds.
+    default no
+    
+    terminate if lock is held longer than the specified time, in miliseconds.
   
   - hthread_lock_try_threshold
   
-    > default 5000 miliseconds
     
-    > print report if locking operation takes longer than the specified time, in miliseconds.
+    default 5000 miliseconds
+    
+    print report if locking operation takes longer than the specified time, in miliseconds.
   
   - hthread_lock_try_threshold_assert
   
-    > default no
     
-    > terminate if locking operation takes longer than the specified time, in miliseconds.
+    default no
+    
+    terminate if locking operation takes longer than the specified time, in miliseconds.
 
 ## 3. error reports ##
 
