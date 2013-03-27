@@ -896,7 +896,7 @@
 
 ## 5. usage example ##
 
-  using hthread is pretty simple, just clone lbhthread and build, add <tt>-include hthread.h -DHTHREAD_DEBUG=1</tt> to target cflags, and link with <tt>-lhthread -lrt</tt>
+  using hthread is pretty simple, just clone libhthread and build, add <tt>-include hthread.h -DHTHREAD_DEBUG=1</tt> to target cflags, and link with <tt>-lhthread -lrt</tt>
   
     # git clone git://github.com/anhanguera/libhthread.git
     # cd libhthread
@@ -947,8 +947,6 @@
   monitoring with hthread:
 
     # gcc -include src/hthread.h -DHTHREAD_DEBUG=1 -o app-debug main.c -Lsrc -lhthread -lrt -lpthread
-    # ./app-debug
-    
     # LD_LIBRARY_PATH=src ./app-debug
     (hthread:32648) new thread created: 'root-process (0xab10b0)'
     (hthread:32648)     at: (null) (null):0
