@@ -15,8 +15,12 @@ libhthread.so_files-y = \
 	libhthread.o
 
 libhthread.so_ldflags-y = \
-	-lpthread \
+	-lpthread
+
+ifeq ($(uname_S), Linux)
+libhthread.so_ldflags-y = \
 	-lrt
+endif
 
 libhthread-actual.o_files-y = \
 	hthread.c
