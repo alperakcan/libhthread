@@ -16,6 +16,9 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <assert.h>
+#if defined(__DARWIN__) && (__DARWIN__ == 1)
+#include <mach/mach_time.h>
+#endif
 
 #define HTHREAD_INTERNAL			1
 
@@ -814,15 +817,27 @@ static struct hthread_mutex_order *debug_orders = NULL;
 
 static inline unsigned long long debug_getclock (void)
 {
-	long long tsec;
-	long long tusec;
 	struct timespec ts;
+	unsigned long long tsec;
+	unsigned long long tusec;
+	unsigned long long _clock;
+#if defined(__DARWIN__) && (__DARWIN__ == 1)
+	(void) ts;
+	(void) tsec;
+	(void) tusec;
+	_clock = mach_absolute_time();
+	_clock /= 1000 * 1000;
+#elif defined(__LINUX__) && (__LINUX__ == 1)
 	if (clock_gettime(CLOCK_MONOTONIC, &ts) < 0) {
 		return 0;
 	}
-	tsec = ((long long)ts.tv_sec) * 1000;
-	tusec = ((long long)ts.tv_nsec) / 1000 / 1000;
-	return tsec + tusec;
+	tsec = ((unsigned long long) ts.tv_sec) * 1000;
+	tusec = ((unsigned long long) ts.tv_nsec) / 1000 / 1000;
+	_clock = tsec + tused;
+#else
+	#error "unknown os"
+#endif
+	return _clock;
 }
 
 static inline int debug_mutex_add_lock (struct hthread_mutex *mutex, const char *command, const char *func, const char *file, const int line)
