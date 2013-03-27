@@ -110,8 +110,6 @@ struct hthread {
 	const char *func;
 	const char *file;
 	int line;
-	int frames;
-	void *callstack[HTHREAD_CALLSTACK_MAX];
         char name[0];
 #endif
 };
@@ -225,8 +223,12 @@ static inline int hthread_add_actual (struct hthread *thread, const char *func, 
 	HASH_ADD(hh, hthreads, thread, sizeof(thread->thread), thread);
 #if defined(HTHREAD_DEBUG) && (HTHREAD_DEBUG == 1)
 	hdebug_lock();
-	hinfof("new thread created: '%s (%p)'", thread->name, thread);
-	hinfof("    at: %s %s:%d", func, file, line);
+	if (func == NULL && file == NULL && line == 0) {
+		hinfof("injected thread: %s (%p)", thread->name, thread);
+	} else {
+		hinfof("new thread created: '%s (%p)'", thread->name, thread);
+		hinfof("    at: %s %s:%d", func, file, line);
+	}
 	hdebug_unlock();
 #endif
 	return 0;
@@ -347,7 +349,6 @@ found_sth:
 	hinfof("%s with invalid thread: '%p'", command, thread);
 	hinfof("    by: %s (%p)", sth->name, sth);
 	hinfof("    at: %s %s:%d", func, file, line);
-	debug_dump_callstack("        ");
 	hdebug_unlock();
 	hassert((th == thread) && "invalid thread");
 	hthread_unlock();
@@ -892,7 +893,7 @@ static inline int debug_dump_callstack (const char *prefix)
 					if (!stackinfo.func_addr && stackinfo.func) {
 						asymbol **asymp;
 						for (asymp = syms; *asymp; asymp++) {
-							if (strcmp (bfd_asymbol_name (*asymp), stackinfo.func) == 0) {
+							if (strcmp(bfd_asymbol_name(*asymp), stackinfo.func) == 0) {
 								stackinfo.func_addr = bfd_asymbol_value (*asymp) + (void *) 0;
 								break;
 							}
