@@ -989,9 +989,9 @@
 
   compile libhthread
 
-	# git clone git://github.com/anhanguera/libhthread.git
-	# cd libhthread
-	# make
+	git clone git://github.com/anhanguera/libhthread.git
+	cd libhthread
+	make
   
   let below is the source code - with double lock error - to be monitored:
   
