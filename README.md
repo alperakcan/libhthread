@@ -4,9 +4,21 @@ hthread is a thread error detector and helper library with synchronization error
 c/c++ programs that use the pthreads.
 
 1. <a href="#1-overview">overview</a>
+  - <a href="#11-misuses-of-pthreads-api">misuses of pthreads api</a>
+  - <a href="#12-lock-ordering-violation">lock ordering violation</a>
+  - <a href="#13-lock-contention">lock contention</a>
 2. <a href="#2-configuration">configuration</a>
+  - <a href="#21-compile-time-options">compile-time options</a>
+  - <a href="#22-run-time-options">run-time options</a>
 3. <a href="#3-error-reports">error reports</a>
+  - <a href="#31-misuses-of-pthreads-api">misuses of pthreads api</a>
+  - <a href="#32-lock-ordering-violation">lock ordering violation</a>
+  - <a href="#33-lock-contention">lock contention</a>
 4. <a href="#4-test-cases">test cases</a>
+  - <a href="#41-mutex-tests">mutex tests</a>
+  - <a href="#42-condition-tests">condition tests</a>
+  - <a href="#43-thread-tests">thread tests</a>
+  - <a href="#44-lock-contention-tests">lock contention tests</a>
 5. <a href="#5-usage-example">usage example</a>
 6. <a href="#6-contact">contact</a>
 7. <a href="#7-license">license</a>
@@ -175,6 +187,10 @@ please check example section for demonstration.
   terminate if locking operation takes longer than the specified time, in miliseconds.
 
 ## 3. error reports ##
+
+1. <a href="#31-misuses-of-pthreads-api">misuses of pthreads api</a>
+2. <a href="#32-lock-ordering-violation">lock ordering violation</a>
+3. <a href="#33-lock-contention">lock contention</a>
 
 ### 3.1. misuses of pthreads api ###
 
@@ -453,7 +469,7 @@ please check example section for demonstration.
     (hthread:30834)     at: main fail-42.c:38
     fail-42-debug: hthread.c:1247: debug_mutex_del_lock: Assertion `(mtl == ((void *)0)) && "mutex is locked by other thread"' failed.
 
-### 3.2 lock ordering violation ###
+### 3.2. lock ordering violation ###
 
 1. <a href="#321-lock-order-violation-in-same-thread">lock order violation in same thread</a>
 2. <a href="#322-lock-order-violation-while-timedwaiting-on-condition">lock order violation while [timed]waiting on condition</a>
