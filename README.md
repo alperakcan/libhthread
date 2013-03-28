@@ -25,10 +25,10 @@
   
   and has benefits of:
   
-  - has a negligible effect run-time speed
-  - does not reqiure any source code change
-  - operating system and architecture independent
-  - easy to use
+  1. has a negligible effect run-time speed
+  2. does not reqiure any source code change
+  3. operating system and architecture independent
+  4. easy to use
 
   can detect errors of:
   
