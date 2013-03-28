@@ -1,61 +1,61 @@
 # hthread #
 
-  hthread is a thread error detector and helper library with synchronization errors detection support for
-  c/c++ programs that use the pthreads.
-  
-  1. <a href="#1-overview">overview</a>
-  2. <a href="#2-configuration">configuration</a>
-  3. <a href="#3-error-reports">error reports</a>
-  4. <a href="#4-test-cases">test cases</a>
-  5. <a href="#5-usage-example">usage example</a>
-  6. <a href="#6-contact">contact</a>
-  7. <a href="#7-license">license</a>
+hthread is a thread error detector and helper library with synchronization errors detection support for
+c/c++ programs that use the pthreads.
+
+1. <a href="#1-overview">overview</a>
+2. <a href="#2-configuration">configuration</a>
+3. <a href="#3-error-reports">error reports</a>
+4. <a href="#4-test-cases">test cases</a>
+5. <a href="#5-usage-example">usage example</a>
+6. <a href="#6-contact">contact</a>
+7. <a href="#7-license">license</a>
 
 ## 1. overview ##
   
-  hthread is a thread error detector and helper library with synchronization errors detection support for
-  c/c++ programs that use the pthreads.
+hthread is a thread error detector and helper library with synchronization errors detection support for
+c/c++ programs that use the pthreads.
 
-  hthread is a lightweight thread error detector and helper library with synchronization error detection
-  support, specifically designed for embedded systems.
-  
-  main use case may include embedded systems where <a href="http://valgrind.org">valgrind</a> 
-  <a href="http://valgrind.org/docs/manual/drd-manual.html">drd</a>, or
-  <a href="http://valgrind.org/docs/manual/hg-manual.html">helgrind</a> support **is not** available.
-  
-  and has benefits of:
-  
-  * has a negligible effect run-time speed
-  * does not require any source code change
-  * operating system and architecture independent
-  * easy to use
-  
+hthread is a lightweight thread error detector and helper library with synchronization error detection
+support, specifically designed for embedded systems.
+
+main use case may include embedded systems where <a href="http://valgrind.org">valgrind</a> 
+<a href="http://valgrind.org/docs/manual/drd-manual.html">drd</a>, or
+<a href="http://valgrind.org/docs/manual/hg-manual.html">helgrind</a> support **is not** available.
+
+and has benefits of:
+
+* has a negligible effect run-time speed
+* does not require any source code change
+* operating system and architecture independent
+* easy to use
+
 can detect errors of:
-  
-  1. <a href="#11-misuses-of-pthreads-api">misuses of pthreads api</a>
-  2. <a href="#12-lock-ordering-violation">lock ordering violation</a>
-  3. <a href="#13-lock-contention">lock contention</a>
+
+1. <a href="#11-misuses-of-pthreads-api">misuses of pthreads api</a>
+2. <a href="#12-lock-ordering-violation">lock ordering violation</a>
+3. <a href="#13-lock-contention">lock contention</a>
 
 ### 1.1 misuses of pthreads api ###
 
-  hthread is able to detect and report following errors. although some of them are too obvious, early detection is much better
-  than to deal with hard-to-find bugs.
-  
-  1. destroying an invalid mutex - <a href="test/fail-00.c">fail-00.c</a>, <a href="#311-destroying-an-invalid-mutex">report</a>
-  2. locking an invalid mutex - <a href="test/fail-01.c">fail-01.c</a>, <a href="#312-locking-an-invalid-mutex">report</a>
-  3. unlocking an invalid mutex - <a href="test/fail-02.c">fail-02.c</a>, <a href="#313-unlocking-an-invalid-mutex">report</a>
-  4. locking an already locked mutex - <a href="test/fail-03.c">fail-03.c</a>, <a href="#314-locking-an-already-locked-mutex">report</a>
-  5. unlocking an unheld mutex - <a href="test/fail-05.c">fail-05.c</a>, <a href="#315-unlocking-an-unheld-mutex">report</a>
-  6. destroying a locked mutex - <a href="test/fail-06.c">fail-06.c</a>, <a href="#316-destroying-a-locked-mutex">report</a>
-  7. destroying an invalid condition - <a href="test/fail-20.c">fail-20.c</a>, <a href="#317-destroying-an-invalid-condition">report</a>
-  8. signaling an invalid condition - <a href="test/fail-21.c">fail-21.c</a>, <a href="#318-signaling-an-invalid-condition">report</a>
-  9. broadcasting an invalid condition - <a href="test/fail-22.c">fail-22.c</a>, <a href="#319-broadcasting-an-invalid-condition">report</a>
-  10. [timed]waiting on an invalid condition - <a href="test/fail-23.c">fail-23.c</a>, <a href="#3110-timedwaiting-on-an-invalid-condition">report</a>
-  11. [timed]waiting on an invalid mutex - <a href="test/fail-24.c">fail-24.c</a>, <a href="#3111-timedwaiting-on-an-invalid-mutex">report</a>
-  12. [timed]waiting on an unheld mutex - <a href="test/fail-25.c">fail-25.c</a>, <a href="#3112-timedwaiting-on-an-unheld-mutex">report</a>
-  13. join invalid thread - <a href="test/fail-40.c">fail-40.c</a>, <a href="#3113-join-invalid-thread">report</a>
-  14. detach invalid thread - <a href="test/fail-41.c">fail-41.c</a>, <a href="#3113-join-invalid-thread">report</a>
-  15. unlocking mutex that was held by other thread - <a href="test/fail-42.c">fail-42.c</a>, <a href="#3115-unlocking-mutex-that-was-held-by-other-thread">report</a>
+hthread is able to detect and report following errors. although some of them are too obvious, early detection is much better
+than to deal with hard-to-find bugs.
+
+1. destroying an invalid mutex - <a href="test/fail-00.c">fail-00.c</a>, <a href="#311-destroying-an-invalid-mutex">report</a>
+2. locking an invalid mutex - <a href="test/fail-01.c">fail-01.c</a>, <a href="#312-locking-an-invalid-mutex">report</a>
+3. unlocking an invalid mutex - <a href="test/fail-02.c">fail-02.c</a>, <a href="#313-unlocking-an-invalid-mutex">report</a>
+4. locking an already locked mutex - <a href="test/fail-03.c">fail-03.c</a>, <a href="#314-locking-an-already-locked-mutex">report</a>
+5. unlocking an unheld mutex - <a href="test/fail-05.c">fail-05.c</a>, <a href="#315-unlocking-an-unheld-mutex">report</a>
+6. destroying a locked mutex - <a href="test/fail-06.c">fail-06.c</a>, <a href="#316-destroying-a-locked-mutex">report</a>
+7. destroying an invalid condition - <a href="test/fail-20.c">fail-20.c</a>, <a href="#317-destroying-an-invalid-condition">report</a>
+8. signaling an invalid condition - <a href="test/fail-21.c">fail-21.c</a>, <a href="#318-signaling-an-invalid-condition">report</a>
+9. broadcasting an invalid condition - <a href="test/fail-22.c">fail-22.c</a>, <a href="#319-broadcasting-an-invalid-condition">report</a>
+10. [timed]waiting on an invalid condition - <a href="test/fail-23.c">fail-23.c</a>, <a href="#3110-timedwaiting-on-an-invalid-condition">report</a>
+11. [timed]waiting on an invalid mutex - <a href="test/fail-24.c">fail-24.c</a>, <a href="#3111-timedwaiting-on-an-invalid-mutex">report</a>
+12. [timed]waiting on an unheld mutex - <a href="test/fail-25.c">fail-25.c</a>, <a href="#3112-timedwaiting-on-an-unheld-mutex">report</a>
+13. join invalid thread - <a href="test/fail-40.c">fail-40.c</a>, <a href="#3113-join-invalid-thread">report</a>
+14. detach invalid thread - <a href="test/fail-41.c">fail-41.c</a>, <a href="#3113-join-invalid-thread">report</a>
+15. unlocking mutex that was held by other thread - <a href="test/fail-42.c">fail-42.c</a>, <a href="#3115-unlocking-mutex-that-was-held-by-other-thread">report</a>
 
 ### 1.2 lock ordering violation ###
 
