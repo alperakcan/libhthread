@@ -59,49 +59,47 @@ than to deal with hard-to-find bugs.
 
 ### 1.2 lock ordering violation ###
 
-  hthread is able to detect inconsistent locking orders, it is very useful because they usually result to deadlocks. they may never
-  be discovered during testing and lead to hard-to-find bugs.
-  
-  hthread monitors locks/unlocks and stores them in separate tables for each thread. this allows hthread to build a global lock order
-  table for running process. hthread checks for locking order violation against global order table for each lock request, and able to
-  detect and report following errors.
+hthread is able to detect inconsistent locking orders, it is very useful because they usually result to deadlocks. they may never
+be discovered during testing and lead to hard-to-find bugs.
 
-  1. lock order violation in same thread - <a href="test/fail-04.c">fail-04.c</a>, <a href="#321-lock-order-violation-in-same-thread">report</a>
-  2. lock order violation while [timed]waiting on condition - <a href="test/fail-26.c">fail-26.c</a>, <a href="#322-lock-order-violation-while-timedwaiting-on-condition">report</a>
-  3. lock order violation between threads - <a href="test/fail-43.c">fail-43.c</a>, <a href="#323-lock-order-violation-between-threads">report</a>
+hthread monitors locks/unlocks and stores them in separate tables for each thread. this allows hthread to build a global lock order
+table for running process. hthread checks for locking order violation against global order table for each lock request, and able to
+detect and report following errors.
+
+1. lock order violation in same thread - <a href="test/fail-04.c">fail-04.c</a>, <a href="#321-lock-order-violation-in-same-thread">report</a>
+2. lock order violation while [timed]waiting on condition - <a href="test/fail-26.c">fail-26.c</a>, <a href="#322-lock-order-violation-while-timedwaiting-on-condition">report</a>
+3. lock order violation between threads - <a href="test/fail-43.c">fail-43.c</a>, <a href="#323-lock-order-violation-between-threads">report</a>
 
 ### 1.3 lock contention ###
 
-  hthread able to understand and print report about lock contentions - a thread has to wait until requested lock is released. monitoring
-  lock contentions is handy because, they usually cause unwanted delays or they may point to an undetected potential deadlock. hthread
-  can report followings.
+hthread able to understand and print report about lock contentions - a thread has to wait until requested lock is released. monitoring
+lock contentions is handy because, they usually cause unwanted delays or they may point to an undetected potential deadlock. hthread
+can report followings.
 
-  1. waiting to lock a mutex more than allowed threshold - <a href="test/fail-60.c">fail-60.c</a>, <a href="#331-waiting-to-lock-a-mutex-more-than-allowed-threshold">report</a>
-  2. hold a mutex lock more than allowed threshold - <a href="test/fail-61.c">fail-61.c</a>, <a href="#332-hold-a-mutex-lock-more-than-allowed-threshold">report</a>
+1. waiting to lock a mutex more than allowed threshold - <a href="test/fail-60.c">fail-60.c</a>, <a href="#331-waiting-to-lock-a-mutex-more-than-allowed-threshold">report</a>
+2. hold a mutex lock more than allowed threshold - <a href="test/fail-61.c">fail-61.c</a>, <a href="#332-hold-a-mutex-lock-more-than-allowed-threshold">report</a>
 
 ## 2. configuration ##
 
-  1. <a href="#21-compile-time-options">compile-time options</a>
-  2. <a href="#22-run-time-options">run-time options</a>
+1. <a href="#21-compile-time-options">compile-time options</a>
+2. <a href="#22-run-time-options">run-time options</a>
 
 ### 2.1 compile-time options ###
 
-  hthread configuration parameters can be set using <tt>make flags</tt>, please check example section for demonstration.
+hthread configuration parameters can be set using <tt>make flags</tt>, please check example section for demonstration.
 
-  - HTHREAD_ENABLE_CALLSTACK
+- HTHREAD_ENABLE_CALLSTACK
   
+  default 1
   
-    default 1
-    
-    enable/disable reporting call trace information on error, useful but depends on <tt>libbdf</tt>, <tt>libdl</tt>, and <tt>backtrace function from glibc</tt>.
-    may be disabled for toolchains which does not support backtracing.
+  enable/disable reporting call trace information on error, useful but depends on <tt>libbdf</tt>, <tt>libdl</tt>, and <tt>backtrace function from glibc</tt>.
+  may be disabled for toolchains which does not support backtracing.
   
-  - HTHREAD_REPORT_CALLSTACK
+- HTHREAD_REPORT_CALLSTACK
+
+  default 1
   
-  
-    default 1
-    
-    dump callstack info (function call history) for error point.
+  dump callstack info (function call history) for error point.
   
   - HTHREAD_ASSERT_ON_ERROR
   
