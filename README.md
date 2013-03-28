@@ -1,6 +1,7 @@
 # hthread #
 
-  hthread is a thread error detector and helper library with synchronization errors detection support.
+  hthread is a thread error detector and helper library with synchronization errors detection support for
+  c/c++ programs that use the pthreads.
   
   1. <a href="#1-overview">overview</a>
   2. <a href="#2-configuration">configuration</a>
@@ -11,8 +12,23 @@
   7. <a href="#7-license">license</a>
 
 ## 1. overview ##
+  
+  hthread is a thread error detector and helper library with synchronization errors detection support for
+  c/c++ programs that use the pthreads.
 
-  hthread is thread error detector for detecting synchronization errors in c/c++ programs that use the pthreads.
+  hthread is a lightweight thread error detector and helper library with synchronization error detection
+  support, specifically designed for embedded systems.
+  
+  main use case may include embedded systems where <a href="http://valgrind.org">valgrind</a> -
+  <a href="http://valgrind.org/docs/manual/drd-manual.html">drd</a>, or
+  <a href="http://valgrind.org/docs/manual/hg-manual.html>helgrind</a> support <b>is not</b> available.
+  
+  and has benefits of:
+  
+  - has a negligible effect run-time speed
+  - does not reqiure any source code change
+  - operating system and architecture independent
+  - easy to use
 
   can detect errors of:
   
