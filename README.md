@@ -30,6 +30,7 @@
   - operating system and architecture independent
   - easy to use
   - can detect errors of:
+  
     1. <a href="#11-misuses-of-pthreads-api">misuses of pthreads api</a>
     2. <a href="#12-lock-ordering-violation">lock ordering violation</a>
     3. <a href="#13-lock-contention">lock contention</a>
