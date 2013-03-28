@@ -4,6 +4,7 @@ hthread is a thread error detector and helper library with synchronization error
 c/c++ programs that use the pthreads.
 
 1. <a href="#1-overview">overview</a>
+   1. <a href="#11-misuses-of-pthreads-api">misuses of pthreads api</a>
 2. <a href="#2-configuration">configuration</a>
 3. <a href="#3-error-reports">error reports</a>
 4. <a href="#4-test-cases">test cases</a>
