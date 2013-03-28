@@ -30,6 +30,8 @@
   - operating system and architecture independent
   - easy to use
 
+
+
   can detect errors of:
   
   1. <a href="#11-misuses-of-pthreads-api">misuses of pthreads api</a>
