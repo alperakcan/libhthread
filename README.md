@@ -19,22 +19,10 @@
   hthread is a lightweight thread error detector and helper library with synchronization error detection
   support, specifically designed for embedded systems.
   
-  main use case may include embedded systems where <a href="http://valgrind.org">valgrind</a> -
+  main use case may include embedded systems where <a href="http://valgrind.org">valgrind</a> 
   <a href="http://valgrind.org/docs/manual/drd-manual.html">drd</a>, or
   <a href="http://valgrind.org/docs/manual/hg-manual.html>helgrind</a> support <b>is not</b> available.
   
-  and has benefits of:
-  
-  1. has a negligible effect run-time speed
-  2. does not reqiure any source code change
-  3. operating system and architecture independent
-  4. easy to use
-
-  can detect errors of:
-  
-  1. <a href="#11-misuses-of-pthreads-api">misuses of pthreads api</a>
-  2. <a href="#12-lock-ordering-violation">lock ordering violation</a>
-  3. <a href="#13-lock-contention">lock contention</a>
 
 ### 1.1 misuses of pthreads api ###
 
