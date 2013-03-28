@@ -23,6 +23,13 @@
   <a href="http://valgrind.org/docs/manual/drd-manual.html">drd</a>, or
   <a href="http://valgrind.org/docs/manual/hg-manual.html">helgrind</a> support <b>is not</b> available.
   
+  and has benefits of:
+  
+  1. has a negligible effect run-time speed
+  2. does not reqiure any source code change
+  3. operating system and architecture independent
+  4. easy to use
+
 ### 1.1 misuses of pthreads api ###
 
   hthread is able to detect and report following errors. although some of them are too obvious, early detection is much better
