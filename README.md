@@ -26,7 +26,7 @@
   and has benefits of:
   
   - has a negligible effect run-time speed
-  - does not reqiure any source code change
+  - does not require any source code change
   - operating system and architecture independent
   - easy to use
   - can detect errors of:
