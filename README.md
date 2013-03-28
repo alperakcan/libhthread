@@ -21,7 +21,7 @@
   
   main use case may include embedded systems where <a href="http://valgrind.org">valgrind</a> 
   <a href="http://valgrind.org/docs/manual/drd-manual.html">drd</a>, or
-  <a href="http://valgrind.org/docs/manual/hg-manual.html">helgrind</a> support <b>is not</b> available.
+  <a href="http://valgrind.org/docs/manual/hg-manual.html">helgrind</a> support **is not** available.
   
   and has benefits of:
   
