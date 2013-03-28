@@ -36,7 +36,7 @@ can detect errors of:
 2. <a href="#12-lock-ordering-violation">lock ordering violation</a>
 3. <a href="#13-lock-contention">lock contention</a>
 
-### 1.1 misuses of pthreads api ###
+### 1.1. misuses of pthreads api ###
 
 hthread is able to detect and report following errors. although some of them are too obvious, early detection is much better
 than to deal with hard-to-find bugs.
@@ -57,7 +57,7 @@ than to deal with hard-to-find bugs.
 14. detach invalid thread - <a href="test/fail-41.c">fail-41.c</a>, <a href="#3113-join-invalid-thread">report</a>
 15. unlocking mutex that was held by other thread - <a href="test/fail-42.c">fail-42.c</a>, <a href="#3115-unlocking-mutex-that-was-held-by-other-thread">report</a>
 
-### 1.2 lock ordering violation ###
+### 1.2. lock ordering violation ###
 
 hthread is able to detect inconsistent locking orders, it is very useful because they usually result to deadlocks. they may never
 be discovered during testing and lead to hard-to-find bugs.
@@ -70,7 +70,7 @@ detect and report following errors.
 2. lock order violation while [timed]waiting on condition - <a href="test/fail-26.c">fail-26.c</a>, <a href="#322-lock-order-violation-while-timedwaiting-on-condition">report</a>
 3. lock order violation between threads - <a href="test/fail-43.c">fail-43.c</a>, <a href="#323-lock-order-violation-between-threads">report</a>
 
-### 1.3 lock contention ###
+### 1.3. lock contention ###
 
 hthread able to understand and print report about lock contentions - a thread has to wait until requested lock is released. monitoring
 lock contentions is handy because, they usually cause unwanted delays or they may point to an undetected potential deadlock. hthread
@@ -84,7 +84,7 @@ can report followings.
 1. <a href="#21-compile-time-options">compile-time options</a>
 2. <a href="#22-run-time-options">run-time options</a>
 
-### 2.1 compile-time options ###
+### 2.1. compile-time options ###
 
 hthread configuration parameters can be set using <tt>make flags</tt>, please check example section for demonstration.
 
@@ -101,109 +101,98 @@ hthread configuration parameters can be set using <tt>make flags</tt>, please ch
   
   dump callstack info (function call history) for error point.
   
-  - HTHREAD_ASSERT_ON_ERROR
+- HTHREAD_ASSERT_ON_ERROR
+
+  default 1
   
-    
-    default 1
-    
-    terminate the process on any pthreads api misuse and/or lock order violation.
+  terminate the process on any pthreads api misuse and/or lock order violation.
+
+- HTHREAD_LOCK_THRESHOLD
+
+  default 5000 miliseconds
   
-  - HTHREAD_LOCK_THRESHOLD
+  print report if lock is held longer than the specified time, in miliseconds.
+
+- HTHREAD_LOCK_THRESHOLD_ASSERT
+
+  default 0
   
-    
-    default 5000 miliseconds
-    
-    print report if lock is held longer than the specified time, in miliseconds.
+  terminate if lock is held longer than the specified time, in miliseconds.
+
+- HTHREAD_LOCK_TRY_THRESHOLD
   
-  - HTHREAD_LOCK_THRESHOLD_ASSERT
-  
-    
-    default 0
-    
-    terminate if lock is held longer than the specified time, in miliseconds.
-  
-  - HTHREAD_LOCK_TRY_THRESHOLD
-  
-    
-    default 5000 miliseconds
-    
-    print report if locking operation takes longer than the specified time, in miliseconds.
-  
-  - HTHREAD_LOCK_TRY_THRESHOLD_ASSERT
-  
-    
-    default 0
-    
-    terminate if locking operation takes longer than the specified time, in miliseconds.
+  default 5000 miliseconds
+
+  print report if locking operation takes longer than the specified time, in miliseconds.
+
+- HTHREAD_LOCK_TRY_THRESHOLD_ASSERT
+
+  default 0
+
+  terminate if locking operation takes longer than the specified time, in miliseconds.
  
-### 2.2 run-time options ###
+### 2.2. run-time options ###
   
-  hthread reads configuration parameters from environment via getenv function call. one can either set/change environment variables in source
-  code of monitored project via setenv function call, or set them globally in running shell using export function.
-  
-  please check example section for demonstration.
+hthread reads configuration parameters from environment via getenv function call. one can either set/change environment variables in source
+code of monitored project via setenv function call, or set them globally in running shell using export function.
 
-  - hthread_report_callstack
-  
-  	
-  	default 1
+please check example section for demonstration.
 
-  	dump callstack info (function call history) for error point.
+- hthread_report_callstack
+	
+  default 1
   
-  - hthread_assert_on_error
+  dump callstack info (function call history) for error point.
+
+- hthread_assert_on_error
+    
+  default 1
   
-    
-    default 1
-    
-    terminate the process on any pthreads api misuse and/or lock order violation.
+  terminate the process on any pthreads api misuse and/or lock order violation.
+
+- hthread_lock_hreashold
   
-  - hthread_lock_hreashold
+  default 5000 miliseconds
   
-    
-    default 5000 miliseconds
-    
-    print report if lock is held longer than the specified time, in miliseconds.
+  print report if lock is held longer than the specified time, in miliseconds.
   
-  - hthread_lock_hreashold_assert
+- hthread_lock_hreashold_assert
   
-    
-    default 0
-    
-    terminate if lock is held longer than the specified time, in miliseconds.
+  default 0
   
-  - hthread_lock_try_threshold
+  terminate if lock is held longer than the specified time, in miliseconds.
+
+- hthread_lock_try_threshold
   
-    
-    default 5000 miliseconds
-    
-    print report if locking operation takes longer than the specified time, in miliseconds.
+  default 5000 miliseconds
   
-  - hthread_lock_try_threshold_assert
+  print report if locking operation takes longer than the specified time, in miliseconds.
+
+- hthread_lock_try_threshold_assert
   
-    
-    default 0
-    
-    terminate if locking operation takes longer than the specified time, in miliseconds.
+  default 0
+  
+  terminate if locking operation takes longer than the specified time, in miliseconds.
 
 ## 3. error reports ##
 
-### 3.1 misuses of pthreads api ###
+### 3.1. misuses of pthreads api ###
 
-  1. <a href="#311-destroying-an-invalid-mutex">destroying an invalid mutex</a>
-  2. <a href="#312-locking-an-invalid-mutex">locking an invalid mutex</a>
-  3. <a href="#313-unlocking-an-invalid-mutex">unlocking an invalid mutex</a>
-  4. <a href="#314-locking-an-already-locked-mutex">locking an already locked mutex</a>
-  5. <a href="#315-unlocking-an-unheld-mutex">unlocking an unheld mutex</a>
-  6. <a href="#316-destroying-a-locked-mutex">destroying a locked mutex</a>
-  7. <a href="#317-destroying-an-invalid-condition">destroying an invalid condition</a>
-  8. <a href="#318-signaling-an-invalid-condition">signaling an invalid condition</a>
-  9. <a href="#319-broadcasting-an-invalid-condition">broadcasting an invalid condition</a>
-  10. <a href="#3110-timedwaiting-on-an-invalid-condition">[timed]waiting on an invalid condition</a>
-  11. <a href="#3111-timedwaiting-on-an-invalid-mutex">[timed]waiting on an invalid mutex</a>
-  12. <a href="#3112-timedwaiting-on-an-unheld-mutex">[timed]waiting on an unheld mutex</a>
-  13. <a href="#3113-join-invalid-thread">join invalid thread</a>
-  14. <a href="#3114-detach-invalid-thread">detach invalid thread</a>
-  15. <a href="#3115-unlocking-mutex-that-was-held-by-other-thread">unlocking mutex that was held by other thread</a>
+1. <a href="#311-destroying-an-invalid-mutex">destroying an invalid mutex</a>
+2. <a href="#312-locking-an-invalid-mutex">locking an invalid mutex</a>
+3. <a href="#313-unlocking-an-invalid-mutex">unlocking an invalid mutex</a>
+4. <a href="#314-locking-an-already-locked-mutex">locking an already locked mutex</a>
+5. <a href="#315-unlocking-an-unheld-mutex">unlocking an unheld mutex</a>
+6. <a href="#316-destroying-a-locked-mutex">destroying a locked mutex</a>
+7. <a href="#317-destroying-an-invalid-condition">destroying an invalid condition</a>
+8. <a href="#318-signaling-an-invalid-condition">signaling an invalid condition</a>
+9. <a href="#319-broadcasting-an-invalid-condition">broadcasting an invalid condition</a>
+10. <a href="#3110-timedwaiting-on-an-invalid-condition">[timed]waiting on an invalid condition</a>
+11. <a href="#3111-timedwaiting-on-an-invalid-mutex">[timed]waiting on an invalid mutex</a>
+12. <a href="#3112-timedwaiting-on-an-unheld-mutex">[timed]waiting on an unheld mutex</a>
+13. <a href="#3113-join-invalid-thread">join invalid thread</a>
+14. <a href="#3114-detach-invalid-thread">detach invalid thread</a>
+15. <a href="#3115-unlocking-mutex-that-was-held-by-other-thread">unlocking mutex that was held by other thread</a>
 
 #### 3.1.1. destroying an invalid mutex ####
 
@@ -466,9 +455,9 @@ hthread configuration parameters can be set using <tt>make flags</tt>, please ch
 
 ### 3.2 lock ordering violation ###
 
-  1. <a href="#321-lock-order-violation-in-same-thread">lock order violation in same thread</a>
-  2. <a href="#322-lock-order-violation-while-timedwaiting-on-condition">lock order violation while [timed]waiting on condition</a>
-  3. <a href="#323-lock-order-violation-between-threads">lock order violation between threads</a>
+1. <a href="#321-lock-order-violation-in-same-thread">lock order violation in same thread</a>
+2. <a href="#322-lock-order-violation-while-timedwaiting-on-condition">lock order violation while [timed]waiting on condition</a>
+3. <a href="#323-lock-order-violation-between-threads">lock order violation between threads</a>
 
 #### 3.2.1. lock order violation in same thread ####
 
@@ -563,10 +552,10 @@ hthread configuration parameters can be set using <tt>make flags</tt>, please ch
     (hthread:30838)     at: main fail-43.c:53
     fail-43-debug: hthread.c:1036: debug_mutex_add_lock: Assertion `(mto == ((void *)0)) && "lock order violation"' failed.
 
-### 3.3 lock contention ###
+### 3.3. lock contention ###
 
-  1. <a href="#331-waiting-to-lock-a-mutex-more-than-allowed-threshold">waiting to lock a mutex more than allowed threshold</a>
-  2. <a href="#332-hold-a-mutex-lock-more-than-allowed-threshold">hold a mutex lock more than allowed threshold</a>
+1. <a href="#331-waiting-to-lock-a-mutex-more-than-allowed-threshold">waiting to lock a mutex more than allowed threshold</a>
+2. <a href="#332-hold-a-mutex-lock-more-than-allowed-threshold">hold a mutex lock more than allowed threshold</a>
 
 #### 3.3.1. waiting to lock a mutex more than allowed threshold ####
 
@@ -621,12 +610,12 @@ hthread configuration parameters can be set using <tt>make flags</tt>, please ch
 
 ## 4. test cases ##
 
-  1. <a href="#41-mutex-tests">mutex tests</a>
-  2. <a href="#42-condition-tests">condition tests</a>
-  3. <a href="#43-thread-tests">thread tests</a>
-  4. <a href="#44-lock-contention-tests">lock contention tests</a>
+1. <a href="#41-mutex-tests">mutex tests</a>
+2. <a href="#42-condition-tests">condition tests</a>
+3. <a href="#43-thread-tests">thread tests</a>
+4. <a href="#44-lock-contention-tests">lock contention tests</a>
 
-### 4.1 mutex tests ###
+### 4.1. mutex tests ###
 
   <table>
     <tr valign="top">
@@ -756,7 +745,7 @@ hthread configuration parameters can be set using <tt>make flags</tt>, please ch
     </tr>
   </table>
 
-### 4.2 condition tests ###
+### 4.2. condition tests ###
 
   <table>
     <tr valign="top">
@@ -898,7 +887,7 @@ hthread configuration parameters can be set using <tt>make flags</tt>, please ch
     </tr>
   </table>
 
-### 4.3 thread tests ###
+### 4.3. thread tests ###
 
   <table>
     <tr valign="top">
@@ -991,7 +980,7 @@ hthread configuration parameters can be set using <tt>make flags</tt>, please ch
     </tr>
   </table>
 
-### 4.4 lock contention tests ###
+### 4.4. lock contention tests ###
 
   <table>
     <tr valign="top">
@@ -1062,23 +1051,23 @@ hthread configuration parameters can be set using <tt>make flags</tt>, please ch
 
 ## 5. usage example ##
 
-  using hthread is pretty simple, just clone libhthread and build, add <tt>-include hthread.h -DHTHREAD_DEBUG=1 -g -O1</tt>
-  to target cflags and link with <tt>-lhthread -lrt</tt> if HTHREAD_ENABLE_CALLSTACK is 0 or link with
-  <tt>-lhthread -lrt -ldl -lbfd</tt> if HTHREAD_ENABLE_CALLSTACK is 1
+using hthread is pretty simple, just clone libhthread and build, add <tt>-include hthread.h -DHTHREAD_DEBUG=1 -g -O1</tt>
+to target cflags and link with <tt>-lhthread -lrt</tt> if HTHREAD_ENABLE_CALLSTACK is 0 or link with
+<tt>-lhthread -lrt -ldl -lbfd</tt> if HTHREAD_ENABLE_CALLSTACK is 1
 
-  compile libhthread with callstack support
+compile libhthread with callstack support
 
     # git clone git://github.com/anhanguera/libhthread.git
     # cd libhthread
     # HTHREAD_ENABLE_CALLSTACK=1 make
   
-  compile libhthread without callstack support
+compile libhthread without callstack support
 
     # git clone git://github.com/anhanguera/libhthread.git
     # cd libhthread
     # HTHREAD_ENABLE_CALLSTACK=0 make
   
-  let below is the source code - with double lock error - to be monitored:
+let below is the source code - with double lock error - to be monitored:
   
     1  #include <stdio.h>
     2  #include <stdlib.h>
@@ -1114,13 +1103,13 @@ hthread configuration parameters can be set using <tt>make flags</tt>, please ch
 	32   return 0;
     32 }
     
-  compile and run as usual:
+compile and run as usual:
   
     # gcc -o app main.c -lpthread
     # ./app
     
-  application will not exit, because it is trying to lock a already locked mutex. now, enable
-  monitoring with hthread:
+application will not exit, because it is trying to lock a already locked mutex. now, enable
+monitoring with hthread:
 
     # gcc -include src/hthread.h -DHTHREAD_DEBUG=1 -g -O1 -o app-debug main.c -Lsrc -lhthread -lrt -ldl -lbfd -lpthread
     # LD_LIBRARY_PATH=src ./app-debug
@@ -1140,10 +1129,10 @@ hthread configuration parameters can be set using <tt>make flags</tt>, please ch
     (hthread:30967)     at: main main.c:12
     app-debug: hthread.c:963: debug_mutex_add_lock: Assertion `(mt == ((void *)0)) && "mutex is already locked"' failed.
     
-  hthread detected and reported the error: application was trying to lock an already locked mutex at line 22, which was
-  previously locked at line 17, and was created at line 12. and terminated the process.
+hthread detected and reported the error: application was trying to lock an already locked mutex at line 22, which was
+previously locked at line 17, and was created at line 12. and terminated the process.
 
-  program termination on error can be disabled with <tt>hthread_assert_on_error</tt> configuration parameter
+program termination on error can be disabled with <tt>hthread_assert_on_error</tt> configuration parameter
   
     # hthread_assert_on_error=0 LD_LIBRARY_PATH=src ./app-debug
     (hthread:32648) new thread created: 'root-process (0xab10b0)'
@@ -1158,17 +1147,17 @@ hthread configuration parameters can be set using <tt>make flags</tt>, please ch
     (hthread:32648)     at: main main.c:12
     hthread::error: (mt == NULL) && "mutex is already locked" (debug_mutex_add_lock hthread.c:823)
     
-  this time hthread detected and reported the error, but not terminated the process.
+this time hthread detected and reported the error, but not terminated the process.
 
 ## 6. contact ##
 
-  if you are using the software and/or have any questions, suggestions, etc. please contact with me at alper.akcan@gmail.com
+if you are using the software and/or have any questions, suggestions, etc. please contact with me at alper.akcan@gmail.com
 
 ## 7. license ##
 
-  Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
+Copyright (C) 2009-2013 Alper Akcan <alper.akcan@gmail.com>
 
-  This work is free. It comes without any warranty, to the extent permitted
-  by applicable law. You can redistribute it and/or modify it under the terms
-  of the Do What The Fuck You Want To Public License, Version 2, as published
-  by Sam Hocevar. See the COPYING file for more details.
+This work is free. It comes without any warranty, to the extent permitted
+by applicable law. You can redistribute it and/or modify it under the terms
+of the Do What The Fuck You Want To Public License, Version 2, as published
+by Sam Hocevar. See the COPYING file for more details.
