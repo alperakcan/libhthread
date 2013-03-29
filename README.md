@@ -1129,8 +1129,8 @@ compile and run as usual:
 application will not exit, because it is trying to lock a already locked mutex. now, enable
 monitoring with hthread:
 
-    # gcc -include src/hthread.h -DHTHREAD_DEBUG=1 -g -O1 -o app-debug main.c -Lsrc -lhthread -lrt -ldl -lbfd -lpthread
-    # LD_LIBRARY_PATH=src ./app-debug
+    # gcc -include src/hthread.h -DHTHREAD_DEBUG=1 -g -O1 -o app-debug main.c -lhthread -lrt -ldl -lbfd -lpthread
+    # ./app-debug
     (hthread:30967) new thread created: 'root-process (0x11850b0)'
     (hthread:30967)     at: (null) (null):0
     (hthread:30967) mutex lock with already held mutex: 'mutex(main main.c:12) (0x1185010)'
@@ -1152,7 +1152,7 @@ previously locked at line 17, and was created at line 12. and terminated the pro
 
 program termination on error can be disabled with <tt>hthread_assert_on_error</tt> configuration parameter
   
-    # hthread_assert_on_error=0 LD_LIBRARY_PATH=src ./app-debug
+    # hthread_assert_on_error=0 ./app-debug
     (hthread:32648) new thread created: 'root-process (0xab10b0)'
     (hthread:32648)     at: (null) (null):0
     (hthread:32648) mutex lock with already held mutex: 'mutex(main main.c:12) (0xab1010)'
