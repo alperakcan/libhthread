@@ -20,6 +20,9 @@ c/c++ programs that use the pthreads.
   - <a href="#43-thread-tests">thread tests</a>
   - <a href="#44-lock-contention-tests">lock contention tests</a>
 5. <a href="#5-usage-example">usage example</a>
+  - <a href="#51-build-hthread">build hthread</a>
+  - <a href="#52-double-lock">double lock</a>
+  - <a href="#53-disable-termination">disable termination</a>
 6. <a href="#6-contact">contact</a>
 7. <a href="#7-license">license</a>
 
@@ -1067,11 +1070,17 @@ please check example section for demonstration.
 
 ## 5. usage example ##
 
+  1. <a href="#51-build-hthread">build hthread</a>
+  2. <a href="#52-double-lock">double lock</a>
+  3. <a href="#53-disable-termination">disable termination</a>
+
 using hthread is pretty simple, just clone libhthread and build;
 
 - add <tt>-include hthread.h -DHTHREAD_DEBUG=1 -g -O1</tt> to target cflags
 - link with <tt>-lhthread -lrt</tt> if HTHREAD_ENABLE_CALLSTACK is 0 or
 - link with <tt>-lhthread -lrt -ldl -lbfd</tt> if HTHREAD_ENABLE_CALLSTACK is 1
+
+### 5.1. build hthread ###
 
 compile libhthread with callstack support
 
@@ -1084,7 +1093,9 @@ compile libhthread without callstack support
     # git clone git://github.com/anhanguera/libhthread.git
     # cd libhthread
     # HTHREAD_ENABLE_CALLSTACK=0 make
-  
+
+### 5.2. double lock ###
+
 let below is the source code - with double lock error - to be monitored:
   
     1  #include <stdio.h>
@@ -1149,6 +1160,8 @@ monitoring with hthread:
     
 hthread detected and reported the error: application was trying to lock an already locked mutex at line 22, which was
 previously locked at line 17, and was created at line 12. and terminated the process.
+
+### 5.3. disable termination ###
 
 program termination on error can be disabled with <tt>hthread_assert_on_error</tt> configuration parameter
   
