@@ -732,7 +732,7 @@ int HTHREAD_FUNCTION_NAME(sched_yield_actual) (const char *func, const char *fil
 	(void) func;
 	(void) file;
 	(void) line;
-#if defined(HTHREAD_DISABLE_YIELD) && (HTHREAD_DISABLE_YIELD == 0)
+#if defined(HTHREAD_DISABLE_YIELD) && (HTHREAD_DISABLE_YIELD == 1)
 	return 0;
 #else
 	return sched_yield();
