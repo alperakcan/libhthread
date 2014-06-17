@@ -1482,4 +1482,24 @@ found_cv:
 	return 0;
 }
 
+static void __attribute__ ((constructor)) hthread_init (void)
+{
+}
+
+static void __attribute__ ((destructor)) hthread_fini (void)
+{
+	struct hthread *th;
+	struct hthread *nth;
+	hthread_lock();
+	if (hthreads != NULL) {
+		HASH_ITER(hh, hthreads, th, nth) {
+			HASH_DEL(hthreads, th);
+		}
+	}
+	if (hthread_root != NULL) {
+		free(hthread_root);
+	}
+	hthread_unlock();
+}
+
 #endif
