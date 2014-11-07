@@ -34,12 +34,16 @@ libhthread-debug.o_files-y = \
 libhthread-debug.o_cflags-y = \
 	-DHTHREAD_DEBUG=1
 
-ifneq (${HTHREAD_ENABLE_CALLSTACK}, )
+ifeq (${HTHREAD_ENABLE_CALLSTACK}, 1)
 libhthread-actual.o_cflags-y += \
 	-DHTHREAD_ENABLE_CALLSTACK=${HTHREAD_ENABLE_CALLSTACK}
 
 libhthread-debug.o_cflags-y += \
 	-DHTHREAD_ENABLE_CALLSTACK=${HTHREAD_ENABLE_CALLSTACK}
+
+libhthread.so_ldflags-y = \
+	-lbfd \
+	-ldl
 endif
 
 ifneq (${HTHREAD_REPORT_CALLSTACK}, )

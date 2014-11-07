@@ -480,6 +480,7 @@ int HTHREAD_FUNCTION_NAME(cond_wait_actual) (struct hthread_cond *cond, struct h
 		t += 1;
 		if (t >= 10) {
 			herrorf("still waiting for %s cond, %s mutex @ %s:%s:%d", cond->name, mutex->name, func, file, line);
+			debug_dump_callstack("        ");
 			t = 0;
 		}
 	}
