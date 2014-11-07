@@ -8,8 +8,16 @@
  * http://www.wtfpl.net/ for more details.
  */
 
+#if !defined(__cplusplus)
+
 #if !defined(HTHREAD_H)
 #define HTHREAD_H 1
+
+#if !defined(HTHREAD_ENABLE)
+#define HTHREAD_ENABLE 1
+#endif
+
+#if defined(HTHREAD_ENABLE) && (HTHREAD_ENABLE == 1)
 
 #if !defined(HTHREAD_DISABLE_YIELD)
 #define HTHREAD_DISABLE_YIELD			0
@@ -259,4 +267,6 @@ int HTHREAD_FUNCTION_NAME(cond_signal_actual) (struct hthread_cond *cond, const 
 int HTHREAD_FUNCTION_NAME(cond_broadcast_actual) (struct hthread_cond *cond, const char *func, const char *file, const int line);
 int HTHREAD_FUNCTION_NAME(cond_destroy_actual) (struct hthread_cond *cond, const char *func, const char *file, const int line);
 
+#endif
+#endif
 #endif

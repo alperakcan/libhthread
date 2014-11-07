@@ -90,4 +90,12 @@ libhthread-debug.o_cflags-y += \
 	-DHTHREAD_LOCK_TRY_THRESHOLD_ASSERT=${HTHREAD_LOCK_TRY_THRESHOLD_ASSERT}
 endif
 
+distdir = ../dist
+
+dist.lib-y = \
+	libhthread.so
+
+dist.include-y = \
+	hthread.h
+
 include ../Makefile.lib
